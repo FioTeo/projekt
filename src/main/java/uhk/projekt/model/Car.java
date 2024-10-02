@@ -1,6 +1,7 @@
 package uhk.projekt.model;
 
 public class Car {
+    private int id = -1;
     private String spz;
     private String color;
     private String tankVolume;
@@ -14,6 +15,14 @@ public class Car {
         this.color = color;
         this.tankVolume = tankVolume;
         this.numberOfSeats = numberOfSeats;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getSpz() {

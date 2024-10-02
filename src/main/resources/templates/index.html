@@ -7,8 +7,8 @@
 <body>
 <h1>Auta</h1>
 <ul>
-    <li th:each="car: ${cars}">
-        <a href="@{'/detail'}">
+    <li th:each="car, iter: ${cars}">
+        <a th:href="@{'/detail/' + ${iter.index}}">
             <span th:text="${car.spz}"></span>
         </a>
     </li>
