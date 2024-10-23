@@ -2,16 +2,11 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>PPRO projekt</title>
 </head>
 <body>
-<h1>Auta</h1>
-<ul>
-    <li th:each="car, iter: ${cars}">
-        <a th:href="@{'/detail/' + ${iter.index}}">
-            <span th:text="${car.spz}"></span>
-        </a>
-    </li>
-</ul>
+  <h1>PPRO projekt</h1>
+  <a th:href="@{'/cars/'}">Přehled aut</a>
+  <a th:href="@{'/drivers/'}">Přehled řidičů</a>
 </body>
 </html>

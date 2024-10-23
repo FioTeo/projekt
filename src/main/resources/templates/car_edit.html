@@ -5,18 +5,22 @@
     <title th:text="${edit ? 'Edit Car' : 'New Car'}"></title>
 </head>
 <body>
-<form th:object="${car}" th:action="@{/save}" method="post">
+<form th:object="${car}" th:action="@{/cars/save}" method="post">
     <label>
         SPZ: <input type="text" th:field="*{spz}" th:readonly="${edit}"/>
+        <span th:if="${#fields.hasErros('spz')}" th:errors="*"></span>
     </label>
     <label>
         Color: <input type="text" th:field="*{color}"/>
+        <span th:if="${#fields.hasErros('color')}" th:errors="*"></span>
     </label>
     <label>
         Tank Volume: <input type="text" th:field="*{tankVolume}"/>
+        <span th:if="${#fields.hasErros('tankVolume')}" th:errors="*"></span>
     </label>
     <label>
         Number of Seats: <input type="text" th:field="*{numberOfSeats}"/>
+        <span th:if="${#fields.hasErros('numberOfSeats')}" th:errors="*"></span>
     </label>
     <button type="submit">Save</button>
 </form>

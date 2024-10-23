@@ -1,16 +1,20 @@
 package uhk.projekt.model;
 
+import jakarta.validation.constraints.Size;
+
 public class Car {
     private int id = -1;
+
+    @Size(min = 7, max = 7)
     private String spz;
     private String color;
-    private String tankVolume;
-    private String numberOfSeats;
+    private float tankVolume;
+    private int numberOfSeats;
 
     public Car() {
     }
 
-    public Car(String spz, String color, String tankVolume, String numberOfSeats) {
+    public Car(String spz, String color, float tankVolume, int numberOfSeats) {
         this.spz = spz;
         this.color = color;
         this.tankVolume = tankVolume;
@@ -41,19 +45,19 @@ public class Car {
         this.color = color;
     }
 
-    public String getTankVolume() {
+    public float getTankVolume() {
         return tankVolume;
     }
 
-    public void setTankVolume(String tankVolume) {
+    public void setTankVolume(float tankVolume) {
         this.tankVolume = tankVolume;
     }
 
-    public String getNumberOfSeats() {
+    public int getNumberOfSeats() {
         return numberOfSeats;
     }
 
-    public void setNumberOfSeats(String numberOfSeats) {
+    public void setNumberOfSeats(int numberOfSeats) {
         this.numberOfSeats = numberOfSeats;
     }
 }
