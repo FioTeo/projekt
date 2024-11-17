@@ -2,15 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Úkoly</title>
 </head>
 <body>
 <h1>Úkoly</h1>
 <ul>
-    <li th:each="project, iter: ${user}">
-        <a th:href="@{'/tasks/detail/' + ${iter.index}}">
-            <span th:text="${user.name}"></span>
+    <li th:each="task : ${tasks}">
+        <!-- Odkaz na detail úkolu -->
+        <a th:href="@{'/tasks/detail/' + ${task.id}}">
+            <span th:text="${task.title}">Název úkolu</span>
         </a>
+        <!-- Zobrazení dalších informací o úkolu -->
+        <div>
+            <b>Autor:</b> <span th:text="${task.creator.name}">Jméno autora</span>
+        </div>
+        <div>
+            <b>Řešitel:</b> <span th:text="${task.solver.name}">Jméno řešitele</span>
+        </div>
+        <div>
+            <b>Priorita:</b> <span th:text="${task.priority}">Priorita</span>
+        </div>
     </li>
 </ul>
 </body>

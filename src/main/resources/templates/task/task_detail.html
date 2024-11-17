@@ -2,16 +2,47 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Úkoly</title>
 </head>
 <body>
 <h1>Úkoly</h1>
-<a th:href="@{'/tasks/edit/' + ${index}}"></a>
-<a th:href="@{'/tasks/delete/' + ${index}}"></a>
+
+<a th:href="@{'/tasks/edit/' + ${task.id}}">Editovat</a>
+<a th:href="@{'/tasks/delete/' + ${task.id}}">Smazat</a>
+
+<!-- Detaily úkolu -->
 <ul>
-    <li><b>Name:</b><span th:text="${user.name}"></span></li>
-    <li><b>Age:</b><span th:text="${user.age}"></span></li>
-    <li><b>Salary</b>:</b><span th:text="${user.salary}"></span></li>
+    <li>
+        <h2 th:text="${task.title}">Název úkolu</h2>
+        <div>
+            <b>Popis:</b>
+            <span th:text="${task.description}">Popis úkolu</span>
+        </div>
+        <div>
+            <b>Vytvořil:</b>
+            <span th:text="${task.creator.name}">Jméno autora</span>
+        </div>
+        <div>
+            <b>Řešitel:</b>
+            <span th:text="${task.solver.name}">Jméno řešitele</span>
+        </div>
+        <div>
+            <b>Priorita:</b>
+            <span th:text="${task.priority}">Priorita</span>
+        </div>
+    </li>
 </ul>
+
+<!-- Sekce seznamu úkolů -->
+<h2>Seznam úkolů</h2>
+<div class="tasks">
+    <ul>
+        <li th:each="task : ${tasks}">
+            <a th:href="@{'/tasks/detail/' + ${task.id}}">
+                <span th:text="${task.title}">Název úkolu</span>
+            </a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

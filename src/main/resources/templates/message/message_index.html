@@ -2,15 +2,26 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Zprávy</title>
 </head>
 <body>
 <h1>Zprávy</h1>
 <ul>
-    <li th:each="project, iter: ${user}">
-        <a th:href="@{'/messages/detail/' + ${iter.index}}">
-            <span th:text="${user.name}"></span>
+    <li th:each="message : ${messages}">
+        <!-- Odkaz na detail zprávy -->
+        <a th:href="@{'/messages/detail/' + ${message.id}}">
+            <span th:text="${message.message}">Text zprávy</span>
         </a>
+        <!-- Další informace -->
+        <div>
+            <b>Uživatel:</b> <span th:text="${message.user.name}">Jméno uživatele</span>
+        </div>
+        <div>
+            <b>Úkol:</b> <span th:text="${message.task.title}">Název úkolu</span>
+        </div>
+        <div>
+            <b>Vytvořeno:</b> <span th:text="${message.createdAt}">Datum</span>
+        </div>
     </li>
 </ul>
 </body>

@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Projekty</title>
 </head>
 <body>
 <h1>Projekty</h1>
+
 <ul>
-    <li th:each="project, iter: ${projects}">
-        <a th:href="@{'/projects/detail/' + ${iter.index}}">
-            <span th:text="${project.spz}"></span>
+    <li th:each="project : ${projects}">
+        <!-- Odkaz na detail projektu -->
+        <a th:href="@{'/projects/detail/' + ${project.id}}">
+            <span th:text="${project.name}">Název projektu</span>
         </a>
+        <!-- Zobrazení rozpočtu a autora -->
+        <div>
+            <b>Rozpočet:</b> <span th:text="${project.budget}">Rozpočet</span>
+        </div>
+        <div>
+            <b>Vytvořil:</b> <span th:text="${project.creator.name}">Autor</span>
+        </div>
     </li>
 </ul>
 </body>

@@ -7,18 +7,36 @@
 <body>
 <form th:object="${user}" th:action="@{/user/save}" method="post">
     <label>
-        Name: <input type="text" th:field="*{user.name}" th:readonly="${edit}"/>
-        <span th:if="${#fields.hasErros('name')}" th:errors="*"></span>
+        Jméno:
+        <input type="text" th:field="*{name}" th:readonly="${edit}" />
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Chyba u jména</span>
     </label>
+    <br />
     <label>
-        Age: <input type="text" th:field="*{user.age}"/>
-        <span th:if="${#fields.hasErros('age')}" th:errors="*"></span>
+        Příjmení:
+        <input type="text" th:field="*{surname}" />
+        <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Chyba u příjmení</span>
     </label>
+    <br />
     <label>
-        Salary: <input type="text" th:field="*{user.salary}"/>
-        <span th:if="${#fields.hasErros('salary')}" th:errors="*"></span>
+        Email:
+        <input type="email" th:field="*{email}" />
+        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Chyba u emailu</span>
     </label>
-    <button type="submit">Save</button>
+    <br />
+    <label>
+        Heslo:
+        <input type="password" th:field="*{password}" />
+        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Chyba u hesla</span>
+    </label>
+    <br />
+    <label>
+        Datum vytvoření:
+        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
+        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
+    </label>
+    <br />
+    <button type="submit">Uložit</button>
 </form>
 </body>
 </html>

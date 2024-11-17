@@ -5,20 +5,42 @@
     <title th:text="${edit ? 'Edit Task' : 'New Task'}"></title>
 </head>
 <body>
-<form th:object="${user}" th:action="@{/user/save}" method="post">
+<form th:object="${task}" th:action="@{/task/save}" method="post">
     <label>
-        Name: <input type="text" th:field="*{user.name}" th:readonly="${edit}"/>
-        <span th:if="${#fields.hasErros('name')}" th:errors="*"></span>
+        Název úkolu:
+        <input type="text" th:field="*{title}" th:readonly="${edit}" />
+        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Chyba u názvu</span>
     </label>
+    <br />
     <label>
-        Age: <input type="text" th:field="*{user.age}"/>
-        <span th:if="${#fields.hasErros('age')}" th:errors="*"></span>
+        Popis:
+        <textarea th:field="*{description}"></textarea>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
     </label>
+    <br />
     <label>
-        Salary: <input type="text" th:field="*{user.salary}"/>
-        <span th:if="${#fields.hasErros('salary')}" th:errors="*"></span>
+        Autor:
+        <select th:field="*{creator}">
+            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('creator')}" th:errors="*{creator}">Chyba u autora</span>
     </label>
-    <button type="submit">Save</button>
+    <br />
+    <label>
+        Řešitel:
+        <select th:field="*{solver}">
+            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('solver')}" th:errors="*{solver}">Chyba u řešitele</span>
+    </label>
+    <br />
+    <label>
+        Priorita:
+        <input type="number" th:field="*{priority}" />
+        <span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}">Chyba u priority</span>
+    </label>
+    <br />
+    <button type="submit">Uložit</button>
 </form>
 </body>
 </html>

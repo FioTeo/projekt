@@ -2,15 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Uživatelé</title>
 </head>
 <body>
 <h1>Uživatelé</h1>
 <ul>
-    <li th:each="project, iter: ${user}">
-        <a th:href="@{'/users/detail/' + ${iter.index}}">
-            <span th:text="${user.name}"></span>
+    <li th:each="user : ${users}">
+        <!-- Odkaz na detail uživatele -->
+        <a th:href="@{'/users/detail/' + ${user.id}}">
+            <span th:text="${user.name} + ' ' + ${user.surname}">Jméno a příjmení</span>
         </a>
+        <!-- Zobrazení emailu -->
+        <div>
+            <b>Email:</b> <span th:text="${user.email}">Email uživatele</span>
+        </div>
+        <!-- Zobrazení data vytvoření -->
+        <div>
+            <b>Vytvořen:</b> <span th:text="${user.createdAt}">Datum vytvoření</span>
+        </div>
     </li>
 </ul>
 </body>

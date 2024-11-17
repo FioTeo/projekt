@@ -5,24 +5,40 @@
     <title th:text="${edit ? 'Edit Project' : 'New Project'}"></title>
 </head>
 <body>
-<form th:object="${project}" th:action="@{/projects/save}" method="post">
+<form th:object="${project}" th:action="@{/project/save}" method="post">
     <label>
-        SPZ: <input type="text" th:field="*{spz}" th:readonly="${edit}"/>
-        <span th:if="${#fields.hasErros('spz')}" th:errors="*"></span>
+        Název:
+        <input type="text" th:field="*{name}" th:readonly="${edit}" />
+        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Chyba u názvu</span>
     </label>
+    <br />
     <label>
-        Color: <input type="text" th:field="*{color}"/>
-        <span th:if="${#fields.hasErros('color')}" th:errors="*"></span>
+        Popis:
+        <textarea th:field="*{description}"></textarea>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
     </label>
+    <br />
     <label>
-        Tank Volume: <input type="text" th:field="*{tankVolume}"/>
-        <span th:if="${#fields.hasErros('tankVolume')}" th:errors="*"></span>
+        Rozpočet:
+        <input type="number" step="0.01" th:field="*{budget}" />
+        <span th:if="${#fields.hasErrors('budget')}" th:errors="*{budget}">Chyba u rozpočtu</span>
     </label>
+    <br />
     <label>
-        Number of Seats: <input type="text" th:field="*{numberOfSeats}"/>
-        <span th:if="${#fields.hasErros('numberOfSeats')}" th:errors="*"></span>
+        Autor:
+        <select th:field="*{creator}">
+            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
+        </select>
+        <span th:if="${#fields.hasErrors('creator')}" th:errors="*{creator}">Chyba u autora</span>
     </label>
-    <button type="submit">Save</button>
+    <br />
+    <label>
+        Datum vytvoření:
+        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
+        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
+    </label>
+    <br />
+    <button type="submit">Uložit</button>
 </form>
 </body>
 </html>

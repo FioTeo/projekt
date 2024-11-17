@@ -2,16 +2,21 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Detail zprávy</title>
 </head>
 <body>
-<h1>Zprávy</h1>
-<a th:href="@{'/messages/edit/' + ${index}}"></a>
-<a th:href="@{'/messages/delete/' + ${index}}"></a>
+<h1>Detail zprávy</h1>
+
+<!-- Zobrazení detailů zprávy -->
 <ul>
-    <li><b>Name:</b><span th:text="${user.name}"></span></li>
-    <li><b>Age:</b><span th:text="${user.age}"></span></li>
-    <li><b>Salary</b>:</b><span th:text="${user.salary}"></span></li>
+    <li><b>Text zprávy:</b> <span th:text="${message.message}">Text zprávy</span></li>
+    <li><b>Uživatel:</b> <span th:text="${message.user.name}">Jméno uživatele</span></li>
+    <li><b>Úkol:</b> <span th:text="${message.task.title}">Název úkolu</span></li>
+    <li><b>Vytvořeno:</b> <span th:text="${message.createdAt}">Datum vytvoření</span></li>
 </ul>
+
+<!-- Akce -->
+<a th:href="@{'/messages/edit/' + ${message.id}}">Editovat</a>
+<a th:href="@{'/messages/delete/' + ${message.id}}">Smazat</a>
 </body>
 </html>

@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Message' : 'New Message'}"></title>
+    <title th:text="${edit ? 'Edit TimeLog' : 'New TimeLog'}"></title>
 </head>
 <body>
-<form th:object="${message}" th:action="@{/messages/save}" method="post">
+<form th:object="${timeLog}" th:action="@{/timelogs/save}" method="post">
     <label>
-        Text zprávy:
-        <textarea th:field="*{message}"></textarea>
-        <span th:if="${#fields.hasErrors('message')}" th:errors="*{message}">Chyba u textu zprávy</span>
+        Popis:
+        <textarea th:field="*{description}"></textarea>
+        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
     </label>
     <br />
     <label>
@@ -26,6 +26,12 @@
             <option th:each="task : ${tasks}" th:value="${task}" th:text="${task.title}"></option>
         </select>
         <span th:if="${#fields.hasErrors('task')}" th:errors="*{task}">Chyba u úkolu</span>
+    </label>
+    <br />
+    <label>
+        Čas (hodiny):
+        <input type="number" step="0.01" th:field="*{time}" />
+        <span th:if="${#fields.hasErrors('time')}" th:errors="*{time}">Chyba u času</span>
     </label>
     <br />
     <label>

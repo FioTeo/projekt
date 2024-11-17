@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail časového záznamu</title>
+</head>
+<body>
+<h1>Detail časového záznamu</h1>
+
+<!-- Zobrazení detailů záznamu -->
+<ul>
+    <li><b>Popis:</b> <span th:text="${timeLog.description}">Popis záznamu</span></li>
+    <li><b>Uživatel:</b> <span th:text="${timeLog.user.name}">Jméno uživatele</span></li>
+    <li><b>Úkol:</b> <span th:text="${timeLog.task.title}">Název úkolu</span></li>
+    <li><b>Čas:</b> <span th:text="${timeLog.time}">Hodiny</span></li>
+    <li><b>Vytvořeno:</b> <span th:text="${timeLog.createdAt}">Datum vytvoření</span></li>
+</ul>
+
+<!-- Akce -->
+<a th:href="@{'/timelogs/edit/' + ${timeLog.id}}">Editovat</a>
+<a th:href="@{'/timelogs/delete/' + ${timeLog.id}}">Smazat</a>
+</body>
+</html>

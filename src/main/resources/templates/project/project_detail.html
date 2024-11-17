@@ -2,17 +2,22 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Detail projektu</title>
 </head>
 <body>
-<h1>Projekty</h1>
-<a th:href="@{'/projects/edit/' + ${index}}"></a>
-<a th:href="@{'/projects/delete/' + ${index}}"></a>
+<h1>Detail projektu</h1>
+
+<!-- Zobrazení detailů projektu -->
 <ul>
-    <li><b>SPZ:</b><span th:text="${project.spz}"></span></li>
-    <li><b>Color:</b><span th:text="${project.color}"></span></li>
-    <li><b>Tank Volume</b>:</b><span th:text="${project.tankVolume}"></span></li>
-    <li><b>Number Of Seats</b><span th:text="${project.numberOfSeats}"></span></li>
+    <li><b>Název:</b> <span th:text="${project.name}">Název projektu</span></li>
+    <li><b>Popis:</b> <span th:text="${project.description}">Popis projektu</span></li>
+    <li><b>Autor:</b> <span th:text="${project.creator.name}">Autor</span></li>
+    <li><b>Rozpočet:</b> <span th:text="${project.budget}">Rozpočet</span></li>
+    <li><b>Vytvořen:</b> <span th:text="${project.createdAt}">Datum vytvoření</span></li>
 </ul>
+
+<!-- Akce -->
+<a th:href="@{'/projects/edit/' + ${project.id}}">Editovat</a>
+<a th:href="@{'/projects/delete/' + ${project.id}}">Smazat</a>
 </body>
 </html>
