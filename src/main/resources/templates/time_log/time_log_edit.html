@@ -5,7 +5,7 @@
     <title th:text="${edit ? 'Edit TimeLog' : 'New TimeLog'}"></title>
 </head>
 <body>
-<form th:object="${timeLog}" th:action="@{/timelogs/save}" method="post">
+<form th:object="${timeLog}" th:action="@{/time-logs/save}" method="post">
     <label>
         Popis:
         <textarea th:field="*{description}"></textarea>

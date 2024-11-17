@@ -9,7 +9,7 @@
 <ul>
     <li th:each="timeLog : ${timeLogs}">
         <!-- Odkaz na detail záznamu -->
-        <a th:href="@{'/timelogs/detail/' + ${timeLog.id}}">
+        <a th:href="@{'/time-logs/detail/' + ${timeLog.id}}">
             <span th:text="${timeLog.description}">Popis záznamu</span>
         </a>
         <!-- Další informace -->

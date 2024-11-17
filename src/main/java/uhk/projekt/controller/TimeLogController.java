@@ -42,13 +42,13 @@ public class TimeLogController {
             return "timeLog_detail";
         }
 
-        return "redirect:/tim-logs/";
+        return "redirect:/time-logs/";
     }
 
     @GetMapping("/delete/{index}")
     public String delete(Model model, @PathVariable int index) {
         timeLogService.deleteTimeLogById(index);
-        return "redirect:/tim-logs/";
+        return "redirect:/time-logs/";
     }
 
     @GetMapping("/create")
