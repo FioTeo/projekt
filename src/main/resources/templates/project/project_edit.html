@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Car' : 'New Car'}"></title>
+    <title th:text="${edit ? 'Edit Project' : 'New Project'}"></title>
 </head>
 <body>
-<form th:object="${car}" th:action="@{/cars/save}" method="post">
+<form th:object="${project}" th:action="@{/projects/save}" method="post">
     <label>
         SPZ: <input type="text" th:field="*{spz}" th:readonly="${edit}"/>
         <span th:if="${#fields.hasErros('spz')}" th:errors="*"></span>

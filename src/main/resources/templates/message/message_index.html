@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Zprávy</h1>
+<ul>
+    <li th:each="project, iter: ${user}">
+        <a th:href="@{'/messages/detail/' + ${iter.index}}">
+            <span th:text="${user.name}"></span>
+        </a>
+    </li>
+</ul>
+</body>
+</html>

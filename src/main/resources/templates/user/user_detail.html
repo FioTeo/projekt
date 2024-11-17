@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<h1>Uživatelé</h1>
+<a th:href="@{'/users/edit/' + ${index}}"></a>
+<a th:href="@{'/users/delete/' + ${index}}"></a>
+<ul>
+    <li><b>Name:</b><span th:text="${user.name}"></span></li>
+    <li><b>Age:</b><span th:text="${user.age}"></span></li>
+    <li><b>Salary</b>:</b><span th:text="${user.salary}"></span></li>
+</ul>
+</body>
+</html>

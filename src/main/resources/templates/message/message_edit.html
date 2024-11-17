@@ -2,20 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Driver' : 'New Driver'}"></title>
+    <title th:text="${edit ? 'Edit Message' : 'New Message'}"></title>
 </head>
 <body>
-<form th:object="${driver}" th:action="@{/driver/save}" method="post">
+<form th:object="${user}" th:action="@{/user/save}" method="post">
     <label>
-        Name: <input type="text" th:field="*{driver.name}" th:readonly="${edit}"/>
+        Name: <input type="text" th:field="*{user.name}" th:readonly="${edit}"/>
         <span th:if="${#fields.hasErros('name')}" th:errors="*"></span>
     </label>
     <label>
-        Age: <input type="text" th:field="*{driver.age}"/>
+        Age: <input type="text" th:field="*{user.age}"/>
         <span th:if="${#fields.hasErros('age')}" th:errors="*"></span>
     </label>
     <label>
-        Salary: <input type="text" th:field="*{driver.salary}"/>
+        Salary: <input type="text" th:field="*{user.salary}"/>
         <span th:if="${#fields.hasErros('salary')}" th:errors="*"></span>
     </label>
     <button type="submit">Save</button>

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title th:text="${edit ? 'Edit Task' : 'New Task'}"></title>
+</head>
+<body>
+<form th:object="${user}" th:action="@{/user/save}" method="post">
+    <label>
+        Name: <input type="text" th:field="*{user.name}" th:readonly="${edit}"/>
+        <span th:if="${#fields.hasErros('name')}" th:errors="*"></span>
+    </label>
+    <label>
+        Age: <input type="text" th:field="*{user.age}"/>
+        <span th:if="${#fields.hasErros('age')}" th:errors="*"></span>
+    </label>
+    <label>
+        Salary: <input type="text" th:field="*{user.salary}"/>
+        <span th:if="${#fields.hasErros('salary')}" th:errors="*"></span>
+    </label>
+    <button type="submit">Save</button>
+</form>
+</body>
+</html>
