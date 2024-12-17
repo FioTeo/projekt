@@ -1,40 +1,41 @@
 package uhk.projekt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.Project;
+import uhk.projekt.repository.ProjectRepository;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ProjectServiceImp implements ProjectService {
 
-    ArrayList<Project> projects = new ArrayList<>();
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Override
-    public ArrayList<Project> getAllProjects() {
-        return projects;
+    @Transactional(readOnly = true)
+    public List<Project> getAllProjects() {
+        return projectRepository.findAll();
     }
 
     @Override
-    public Project getProjectById(int id) {
-        if(id > -1 && id < projects.size()) {
-            return projects.get(id);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public Optional<Project> getProjectById(Integer id) {
+        return projectRepository.findById(id);
     }
 
     @Override
-    public void deleteProjectById(int id) {
-        if(id > -1 && id < projects.size()) {
-            projects.remove(id);
-        }
+    @Transactional
+    public Project saveProject(Project project) {
+        return projectRepository.save(project);
     }
 
     @Override
-    public void saveProject(Project project) {
-        if(project.getId() > -1) {
-            projects.remove(project.getId());
-        }
-        projects.add(project);
+    @Transactional
+    public void deleteProjectById(Integer id) {
+        projectRepository.deleteById(id);
     }
 }

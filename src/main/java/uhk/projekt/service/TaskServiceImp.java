@@ -1,50 +1,54 @@
 package uhk.projekt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uhk.projekt.model.Message;
+import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.Task;
+import uhk.projekt.repository.TaskRepository;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TaskServiceImp implements TaskService {
-    ArrayList<Task> tasks = new ArrayList<>();
+
+    @Autowired
+    private TaskRepository taskRepository;
 
     @Override
-    public ArrayList<Task> getAllTasks() {
-        return tasks;
+    @Transactional(readOnly = true)
+    public List<Task> getAllTasks() {
+        return taskRepository.findAll();
     }
 
     @Override
-    public ArrayList<Task> getAllTasksByProject(Task task) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<Task> getAllTasksByProject(Integer projectId) {
+        return taskRepository.findByProjectId(projectId);
     }
 
     @Override
-    public ArrayList<Task> getAllTasksByUser(Task task) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<Task> getAllTasksByUser(Integer userId) {
+        return taskRepository.findBySolverId(userId);
     }
 
     @Override
-    public Task getTaskById(int id) {
-        if(id > -1 && id < tasks.size()) {
-            return tasks.get(id);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public Optional<Task> getTaskById(Integer id) {
+        return taskRepository.findById(id);
     }
 
     @Override
-    public void deleteTaskById(int id) {
-        if(id > -1 && id < tasks.size()) {
-            tasks.remove(id);
-        }
+    @Transactional
+    public Task saveTask(Task task) {
+        // Můžete přidat další logiku, např. validace
+        return taskRepository.save(task);
     }
 
     @Override
-    public void saveTask(Task task) {
-        if(task.getId() > -1) {
-            tasks.remove(task.getId());
-        }
-        tasks.add(task);
+    @Transactional
+    public void deleteTaskById(Integer id) {
+        taskRepository.deleteById(id);
     }
 }

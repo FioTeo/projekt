@@ -2,12 +2,13 @@ package uhk.projekt.service;
 
 import uhk.projekt.model.Message;
 
-import java.util.ArrayList;
+import java.awt.*;
+import java.util.Optional;
 
 public interface MessageService {
-    ArrayList<Message> getAllMessages();
-    ArrayList<Message> getAllMessagesByProject(Message message);
-    Message getMessageById(int id);
-    void deleteMessageById(int id);
-    void saveMessage(Message message);
+    List<Message> getAllMessages();
+    List<Message> getAllMessagesByProject(Integer projectId);
+    Optional<Message> getMessageById(Integer id);
+    void deleteMessageById(Integer id);
+    Message saveMessage(Message message);
 }

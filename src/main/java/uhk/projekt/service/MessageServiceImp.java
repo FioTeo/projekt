@@ -1,46 +1,56 @@
 package uhk.projekt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uhk.projekt.model.Message;
-import uhk.projekt.model.Project;
+import uhk.projekt.repository.MessageRepository;
+import uhk.projekt.repository.TaskRepository;
 
-import java.util.ArrayList;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
-public class MessageServiceImp  implements MessageService {
-    ArrayList<Message> messages = new ArrayList<>();
+public class MessageServiceImp implements MessageService {
+
+    @Autowired
+    private MessageRepository messageRepository;
+
+    @Autowired
+    private TaskRepository taskRepository; // Potřebné pro získání projektů přes úkoly
 
     @Override
-    public ArrayList<Message> getAllMessages() {
-        return messages;
+    @Transactional(readOnly = true)
+    public List<Message> getAllMessages() {
+        return messageRepository.findAll();
     }
 
     @Override
-    public ArrayList<Message> getAllMessagesByProject(Message message) {
-
-        return null;
+    @Transactional(readOnly = true)
+    public List<Message> getAllMessagesByProject(Integer projectId) {
+        return messageRepository.findByTask_Project_Id(projectId);
     }
 
     @Override
-    public Message getMessageById(int id) {
-        if(id > -1 && id < messages.size()) {
-            return messages.get(id);
+    @Transactional(readOnly = true)
+    public Optional<Message> getMessageById(Integer id) {
+        return messageRepository.findById(id);
+    }
+
+    @Override
+    @Transactional
+    public void deleteMessageById(Integer id) {
+        messageRepository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public Message saveMessage(Message message) {
+        if (message.getTask() != null && message.getTask().getId() == 0) {
+            throw new IllegalArgumentException("Task must have a valid ID");
         }
-        return null;
-    }
-
-    @Override
-    public void deleteMessageById(int id) {
-        if(id > -1 && id < messages.size()) {
-            messages.remove(id);
-        }
-    }
-
-    @Override
-    public void saveMessage(Message message) {
-        if(message.getId() > -1) {
-            messages.remove(message.getId());
-        }
-        messages.add(message);
+        messageRepository.save(message);
+        return message;
     }
 }

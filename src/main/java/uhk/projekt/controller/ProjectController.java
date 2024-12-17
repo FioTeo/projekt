@@ -1,80 +1,67 @@
 package uhk.projekt.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Project;
 import uhk.projekt.service.ProjectService;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
-@Controller
-@RequestMapping("/projects/")
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/projects")
 public class ProjectController {
 
-    private final ProjectService projectService;
-
     @Autowired
-    public ProjectController(@Qualifier("projectService") ProjectService projectService) {
-        this.projectService = projectService;
-    }
+    private ProjectService projectService;
 
-    @GetMapping("/")
-    public String index(Model model) {
-        ArrayList<Project> projects = projectService.getAllProjects();
-        model.addAttribute("projects", projects);
-
-        return "project_index";
-    }
-
-    @GetMapping("/detail/{index}")
-    public String detail(Model model, @PathVariable int index) {
-        Project project = projectService.getProjectById(index);
-        if(project != null) {
-            model.addAttribute("project", project);
-            return "project_detail";
+    @PostMapping
+    public ResponseEntity<?> createProject(@Valid @RequestBody Project project, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-
-        return "redirect:/projects/";
-    }
-
-    @GetMapping("/delete/{index}")
-    public String delete(Model model, @PathVariable int index) {
-        projectService.deleteProjectById(index);
-        return "redirect:/projects/";
-    }
-
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("project", new Project());
-        model.addAttribute("edit", false);
-        return "project_edit";
-    }
-
-    @GetMapping("/edit/{index}")
-    public String edit(Model model, @PathVariable int index) {
-        Project project = projectService.getProjectById(index);
-        if(project != null) {
-            project.setId(index);
-            model.addAttribute("project", project);
-            model.addAttribute("edit", true);
-            return "project_edit";
+        try{
+            Project createdProject = projectService.saveProject(project);
+            return ResponseEntity.ok(createdProject);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-
-        return "redirect:/projects/";
     }
 
-    @PostMapping("/save")
-    public String save(@Valid Project project, BindingResult bindingResult, Model model) {
-        if(bindingResult.hasErrors()) {
-            model.addAttribute("edit", true);
-            return "project_edit";
+    @GetMapping
+    public ResponseEntity<List<Project>> getAllProjects(){
+        List<Project> projects = projectService.getAllProjects();
+        return ResponseEntity.ok(projects);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Project> getProjectById(@PathVariable Integer id){
+        Optional<Project> project = projectService.getProjectById(id);
+        return project.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateProject(@PathVariable Integer id, @Valid @RequestBody Project project, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        projectService.saveProject(project);
-        return "redirect:/projects/";
+        try{
+            project.setId(id);
+            Project updatedProject = projectService.saveProject(project);
+            return ResponseEntity.ok(updatedProject);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProject(@PathVariable Integer id){
+        projectService.deleteProjectById(id);
+        return ResponseEntity.noContent().build();
     }
 }

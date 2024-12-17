@@ -1,82 +1,79 @@
 package uhk.projekt.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Task;
 import uhk.projekt.service.TaskService;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
-@Controller
-@RequestMapping("/tasks/")
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/tasks")
 public class TaskController {
-    private final TaskService taskService;
 
     @Autowired
-    public TaskController(@Qualifier("taskService") TaskService taskService) {
-        this.taskService = taskService;
-    }
+    private TaskService taskService;
 
-    @GetMapping("/")
-    public String index(Model model) {
-        ArrayList<Task> tasks = taskService.getAllTasks();
-        model.addAttribute("tasks", tasks);
-
-        return "task_index";
-    }
-
-    @GetMapping("/detail/{index}")
-    public String detail(Model model, @PathVariable int index) {
-        Task Task = taskService.getTaskById(index);
-        if(Task != null) {
-            model.addAttribute("Task", Task);
-            return "task_detail";
+    @PostMapping
+    public ResponseEntity<?> createTask(@Valid @RequestBody Task task, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-
-        return "redirect:/tasks/";
-    }
-
-    @GetMapping("/delete/{index}")
-    public String delete(Model model, @PathVariable int index) {
-        taskService.deleteTaskById(index);
-        return "redirect:/tasks/";
-    }
-
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("Task", new Task());
-        model.addAttribute("edit", false);
-        return "task_edit";
-    }
-
-    @GetMapping("/edit/{index}")
-    public String edit(Model model, @PathVariable int index) {
-        Task Task = taskService.getTaskById(index);
-        if(Task != null) {
-            Task.setId(index);
-            model.addAttribute("Task", Task);
-            model.addAttribute("edit", true);
-            return "task_edit";
+        try{
+            Task createdTask = taskService.saveTask(task);
+            return ResponseEntity.ok(createdTask);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-
-        return "redirect:/tasks/";
     }
 
-    @PostMapping("/save")
-    public String save(@Valid Task Task, BindingResult bindingResult, Model model) {
-        if(bindingResult.hasErrors()) {
-            model.addAttribute("edit", true);
-            return "task_edit";
+    @GetMapping
+    public ResponseEntity<List<Task>> getAllTasks(){
+        List<Task> tasks = taskService.getAllTasks();
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Task> getTaskById(@PathVariable Integer id){
+        Optional<Task> task = taskService.getTaskById(id);
+        return task.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<Task>> getTasksByProject(@PathVariable Integer projectId){
+        List<Task> tasks = taskService.getAllTasksByProject(projectId);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<Task>> getTasksByUser(@PathVariable Integer userId){
+        List<Task> tasks = taskService.getAllTasksByUser(userId);
+        return ResponseEntity.ok(tasks);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateTask(@PathVariable Integer id, @Valid @RequestBody Task task, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        taskService.saveTask(Task);
-        return "redirect:/tasks/";
+        try{
+            task.setId(id);
+            Task updatedTask = taskService.saveTask(task);
+            return ResponseEntity.ok(updatedTask);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteTask(@PathVariable Integer id){
+        taskService.deleteTaskById(id);
+        return ResponseEntity.noContent().build();
     }
 }

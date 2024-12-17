@@ -1,13 +1,37 @@
 package uhk.projekt.model;
 
-import jakarta.validation.constraints.Min;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
+@Entity
+@Table(name = "users")
 public class User {
-    private int id = -1;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @NotBlank(message = "Jméno je povinné")
+    @Size(max = 50, message = "Jméno může mít maximálně 50 znaků")
+    @Column(nullable = false, length = 50)
     private String name;
+
+    @NotBlank(message = "Příjmení je povinné")
+    @Size(max = 50, message = "Příjmení může mít maximálně 50 znaků")
+    @Column(nullable = false, length = 50)
     private String surname;
+
+    @NotBlank(message = "Email je povinný")
+    @Email(message = "Neplatný formát emailu")
+    @Column(nullable = false, unique = true, length = 100)
     private String email;
+
+    @NotBlank(message = "Heslo je povinné")
+    @Size(min = 6, message = "Heslo musí mít alespoň 6 znaků")
+    @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false)
     private String createdAt;
 
     public User() {

@@ -1,82 +1,73 @@
 package uhk.projekt.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Message;
 import uhk.projekt.service.MessageService;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
-@Controller
-@RequestMapping("/messages/")
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/messages")
 public class MessageController {
-    private final MessageService messageService;
 
     @Autowired
-    public MessageController(@Qualifier("messageService") MessageService messageService) {
-        this.messageService = messageService;
-    }
+    private MessageService messageService;
 
-    @GetMapping("/")
-    public String index(Model model) {
-        ArrayList<Message> messages = messageService.getAllMessages();
-        model.addAttribute("messages", messages);
-
-        return "message_index";
-    }
-
-    @GetMapping("/detail/{index}")
-    public String detail(Model model, @PathVariable int index) {
-        Message Message = messageService.getMessageById(index);
-        if(Message != null) {
-            model.addAttribute("Message", Message);
-            return "message_detail";
+    @PostMapping
+    public ResponseEntity<?> createMessage(@Valid @RequestBody Message message, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-
-        return "redirect:/messages/";
-    }
-
-    @GetMapping("/delete/{index}")
-    public String delete(Model model, @PathVariable int index) {
-        messageService.deleteMessageById(index);
-        return "redirect:/messages/";
-    }
-
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("Message", new Message());
-        model.addAttribute("edit", false);
-        return "message_edit";
-    }
-
-    @GetMapping("/edit/{index}")
-    public String edit(Model model, @PathVariable int index) {
-        Message Message = messageService.getMessageById(index);
-        if(Message != null) {
-            Message.setId(index);
-            model.addAttribute("Message", Message);
-            model.addAttribute("edit", true);
-            return "message_edit";
+        try{
+            Message createdMessage = messageService.saveMessage(message);
+            return ResponseEntity.ok(createdMessage);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-
-        return "redirect:/messages/";
     }
 
-    @PostMapping("/save")
-    public String save(@Valid Message Message, BindingResult bindingResult, Model model) {
-        if(bindingResult.hasErrors()) {
-            model.addAttribute("edit", true);
-            return "message_edit";
+    @GetMapping
+    public ResponseEntity<List<Message>> getAllMessages(){
+        List<Message> messages = messageService.getAllMessages();
+        return ResponseEntity.ok(messages);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Message> getMessageById(@PathVariable Integer id){
+        Optional<Message> message = messageService.getMessageById(id);
+        return message.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/project/{projectId}")
+    public ResponseEntity<List<Message>> getMessagesByProject(@PathVariable Integer projectId){
+        List<Message> messages = messageService.getAllMessagesByProject(projectId);
+        return ResponseEntity.ok(messages);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateMessage(@PathVariable Integer id, @Valid @RequestBody Message message, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        messageService.saveMessage(Message);
-        return "redirect:/messages/";
+        try{
+            message.setId(id);
+            Message updatedMessage = messageService.saveMessage(message);
+            return ResponseEntity.ok(updatedMessage);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteMessage(@PathVariable Integer id){
+        messageService.deleteMessageById(id);
+        return ResponseEntity.noContent().build();
     }
 }

@@ -1,19 +1,37 @@
 package uhk.projekt.model;
 
-import java.util.Date;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 
+@Entity
+@Table(name = "messages")
 public class Message {
-    private int id =-1;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "task_id", nullable = false)
     private Task task;
+
+    @NotBlank(message = "Zpráva je povinná")
+    @Size(max = 1000, message = "Zpráva může mít maximálně 1000 znaků")
+    @Column(nullable = false, length = 1000)
     private String message;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
-    private Date createdAt;
+
+    @Column(nullable = false)
+    private String createdAt;
 
     public Message() {
 
     }
 
-    public Message(int id, Task task, String message, User user, Date createdAt) {
+    public Message(int id, Task task, String message, User user, String createdAt) {
         this.id = id;
         this.task = task;
         this.message = message;
@@ -53,11 +71,11 @@ public class Message {
         this.user = user;
     }
 
-    public Date getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(Date createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 }

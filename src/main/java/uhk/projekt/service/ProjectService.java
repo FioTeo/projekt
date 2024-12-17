@@ -1,15 +1,13 @@
 package uhk.projekt.service;
 
-import org.springframework.stereotype.Service;
 import uhk.projekt.model.Project;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-@Service
 public interface ProjectService {
-
-    ArrayList<Project> getAllProjects();
-    Project getProjectById(int id);
-    void deleteProjectById(int id);
-    void saveProject(Project project);
+    List<Project> getAllProjects();
+    Optional<Project> getProjectById(Integer id);
+    Project saveProject(Project project);
+    void deleteProjectById(Integer id);
 }

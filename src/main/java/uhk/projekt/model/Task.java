@@ -1,12 +1,42 @@
 package uhk.projekt.model;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
+
+@Entity
+@Table(name = "tasks")
 public class Task {
-    private int id = -1;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
+
+    @NotBlank(message = "Název úkolu je povinný")
+    @Size(max = 100, message = "Název úkolu může mít maximálně 100 znaků")
+    @Column(nullable = false, length = 100)
     private String title;
+
+    @Size(max = 500, message = "Popis úkolu může mít maximálně 500 znaků")
+    @Column(length = 500)
     private String description;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "solver_id")
     private User solver;
+
+    @Min(value = 1, message = "Priorita musí být alespoň 1")
+    @Column(nullable = false)
     private int priority;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TimeLog> timeLogs;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Message> messages;
 
     public Task() {
 

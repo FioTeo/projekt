@@ -1,58 +1,59 @@
 package uhk.projekt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uhk.projekt.model.Project;
-import uhk.projekt.model.Task;
+import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.TimeLog;
-import uhk.projekt.model.User;
+import uhk.projekt.repository.TimeLogRepository;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class TimeLogServiceImp implements TimeLogService {
-    ArrayList<TimeLog> timeLogs = new ArrayList<>();
 
+    @Autowired
+    private TimeLogRepository timeLogRepository;
 
     @Override
-    public ArrayList<TimeLog> getAllTimeLogs() {
-        return timeLogs;
+    @Transactional(readOnly = true)
+    public List<TimeLog> getAllTimeLogs() {
+        return timeLogRepository.findAll();
     }
 
     @Override
-    public ArrayList<TimeLog> getAllTimeLogsByUser(User user) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<TimeLog> getAllTimeLogsByUser(Integer userId) {
+        return timeLogRepository.findByUserId(userId);
     }
 
     @Override
-    public ArrayList<TimeLog> getAllTimeLogsByTask(Task task) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<TimeLog> getAllTimeLogsByTask(Integer taskId) {
+        return timeLogRepository.findByTaskId(taskId);
     }
 
     @Override
-    public ArrayList<TimeLog> getAllTimeLogsProject(Project project) {
-        return null;
+    @Transactional(readOnly = true)
+    public List<TimeLog> getAllTimeLogsByProject(Integer projectId) {
+        return timeLogRepository.findByTask_ProjectId(projectId);
     }
 
     @Override
-    public TimeLog getTimeLogById(int id) {
-        if(id > -1 && id < timeLogs.size()) {
-            return timeLogs.get(id);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public Optional<TimeLog> getTimeLogById(Integer id) {
+        return timeLogRepository.findById(id);
     }
 
     @Override
-    public void deleteTimeLogById(int id) {
-        if(id > -1 && id < timeLogs.size()) {
-            timeLogs.remove(id);
-        }
+    @Transactional
+    public TimeLog saveTimeLog(TimeLog timeLog) {
+        return timeLogRepository.save(timeLog);
     }
 
     @Override
-    public void saveTimeLog(TimeLog timeLog) {
-        if(timeLog.getId() > -1) {
-            timeLogs.remove(timeLog.getId());
-        }
-        timeLogs.add(timeLog);
+    @Transactional
+    public void deleteTimeLogById(Integer id) {
+        timeLogRepository.deleteById(id);
     }
 }

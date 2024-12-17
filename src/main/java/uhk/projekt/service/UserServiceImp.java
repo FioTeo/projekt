@@ -1,39 +1,54 @@
 package uhk.projekt.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.User;
+import uhk.projekt.repository.UserRepository;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImp implements UserService {
-    ArrayList<User> users = new ArrayList<>();
+
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder; // Pro hashování hesel
 
     @Override
-    public ArrayList<User> getAllUsers() {
-        return users;
+    @Transactional(readOnly = true)
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
     }
 
     @Override
-    public User getUserById(int id) {
-        if(id > -1 && id < users.size()) {
-            return users.get(id);
-        }
-        return null;
+    @Transactional(readOnly = true)
+    public Optional<User> getUserById(Integer id) {
+        return userRepository.findById(id);
     }
 
     @Override
-    public void deleteUserById(int id) {
-        if(id > -1 && id < users.size()) {
-            users.remove(id);
-        }
+    @Transactional(readOnly = true)
+    public Optional<User> getUserByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
-    public void saveUser(User user) {
-        if(user.getId() > -1) {
-            users.remove(user.getId());
+    @Transactional
+    public User saveUser(User user) {
+        if (user.getPassword() != null && !user.getPassword().isEmpty()) {
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
-        users.add(user);
+        return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void deleteUserById(Integer id) {
+        userRepository.deleteById(id);
     }
 }

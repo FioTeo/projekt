@@ -1,82 +1,74 @@
 package uhk.projekt.controller;
 
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import uhk.projekt.model.Project;
 import uhk.projekt.model.User;
 import uhk.projekt.service.UserService;
 
-import java.util.ArrayList;
+import jakarta.validation.Valid;
+import org.springframework.validation.BindingResult;
 
-@Controller
-@RequestMapping("/users/")
+import java.util.List;
+import java.util.Optional;
+
+@RestController
+@RequestMapping("/api/users")
 public class UserController {
-    private final UserService userService;
 
     @Autowired
-    public UserController(@Qualifier("userService") UserService userService) {
-        this.userService = userService;
-    }
+    private UserService userService;
 
-    @GetMapping("/")
-    public String index(Model model) {
-        ArrayList<User> users = userService.getAllUsers();
-
-        model.addAttribute("users", users);
-
-        return "user_index";
-    }
-
-    @GetMapping("/detail/{index}")
-    public String detail(Model model, @PathVariable int index) {
-        User user = userService.getUserById(index);
-        if(user != null) {
-            model.addAttribute("user", user);
-            return "user_detail";
+    @PostMapping
+    public ResponseEntity<?> createUser(@Valid @RequestBody User user, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-
-        return "redirect:/users/";
-    }
-
-    @GetMapping("/delete/{index}")
-    public String delete(Model model, @PathVariable int index) {
-        userService.deleteUserById(index);
-        return "redirect:/users/";
-    }
-
-    @GetMapping("/create")
-    public String create(Model model) {
-        model.addAttribute("user", new Project());
-        model.addAttribute("edit", false);
-        return "user_edit";
-    }
-
-    @GetMapping("/edit/{index}")
-    public String edit(Model model, @PathVariable int index) {
-        User user = userService.getUserById(index);
-        if(user != null) {
-            user.setId(index);
-            model.addAttribute("user", user);
-            model.addAttribute("edit", true);
-            return "user_edit";
+        try{
+            User createdUser = userService.saveUser(user);
+            return ResponseEntity.ok(createdUser);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
         }
-
-        return "redirect:/users/";
     }
 
-    @PostMapping("/save")
-    public String save(@Valid User user, BindingResult bindingResult, Model model) {
-        if(bindingResult.hasErrors()) {
-            model.addAttribute("edit", true);
-            return "user_edit";
+    @GetMapping
+    public ResponseEntity<List<User>> getAllUsers(){
+        List<User> users = userService.getAllUsers();
+        return ResponseEntity.ok(users);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<User> getUserById(@PathVariable Integer id){
+        Optional<User> userOpt = userService.getUserById(id);
+        return userOpt.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<User> getUserByEmail(@PathVariable String email){
+        Optional<User> userOpt = userService.getUserByEmail(email);
+        return userOpt.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Integer id, @Valid @RequestBody User user, BindingResult result){
+        if(result.hasErrors()){
+            return ResponseEntity.badRequest().body(result.getAllErrors());
         }
-        userService.saveUser(user);
-        return "redirect:/users/";
+        try{
+            user.setId(id);
+            User updatedUser = userService.saveUser(user);
+            return ResponseEntity.ok(updatedUser);
+        } catch(RuntimeException ex){
+            return ResponseEntity.badRequest().body(ex.getMessage());
+        }
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUser(@PathVariable Integer id){
+        userService.deleteUserById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

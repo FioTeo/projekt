@@ -1,14 +1,14 @@
 package uhk.projekt.service;
 
-import org.springframework.stereotype.Service;
 import uhk.projekt.model.User;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
-@Service
 public interface UserService {
-    ArrayList<User> getAllUsers();
-    User getUserById(int id);
-    void deleteUserById(int id);
-    void saveUser(User user);
+    List<User> getAllUsers();
+    Optional<User> getUserById(Integer id);
+    Optional<User> getUserByEmail(String email);
+    User saveUser(User user);
+    void deleteUserById(Integer id);
 }
