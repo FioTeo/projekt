@@ -2,27 +2,41 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Úkoly</title>
+    <title>Seznam úkolů</title>
 </head>
 <body>
-<h1>Úkoly</h1>
-<ul>
-    <li th:each="task : ${tasks}">
-        <!-- Odkaz na detail úkolu -->
-        <a th:href="@{'/tasks/detail/' + ${task.id}}">
-            <span th:text="${task.title}">Název úkolu</span>
-        </a>
-        <!-- Zobrazení dalších informací o úkolu -->
-        <div>
-            <b>Autor:</b> <span th:text="${task.creator.name}">Jméno autora</span>
-        </div>
-        <div>
-            <b>Řešitel:</b> <span th:text="${task.solver.name}">Jméno řešitele</span>
-        </div>
-        <div>
-            <b>Priorita:</b> <span th:text="${task.priority}">Priorita</span>
-        </div>
-    </li>
-</ul>
+<h1>Seznam úkolů</h1>
+
+<!-- Success and Error Messages -->
+<div th:if="${param.success}" style="color: green;">
+    <p th:text="${param.success}">Akce byla úspěšná.</p>
+</div>
+<div th:if="${param.error}" style="color: red;">
+    <p th:text="${param.error}">Došlo k chybě.</p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Název</th>
+        <th>Popis</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="task : ${tasks}">
+        <td th:text="${task.id}">1</td>
+        <td th:text="${task.name}">Název</td>
+        <td th:text="${task.description}">Popis</td>
+        <td>
+            <a th:href="@{'/tasks/detail/' + ${task.id}}">Detail</a> |
+            <a th:href="@{'/tasks/edit/' + ${task.id}}">Editovat</a> |
+            <a th:href="@{'/tasks/delete/' + ${task.id}}" onclick="return confirm('Opravdu chcete smazat tento úkol?');">Smazat</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/tasks/create}">Vytvořit nový úkol</a>
 </body>
 </html>

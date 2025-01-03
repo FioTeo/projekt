@@ -6,18 +6,15 @@
 </head>
 <body>
 <h1>Detail projektu</h1>
-
-<!-- Zobrazení detailů projektu -->
-<ul>
-    <li><b>Název:</b> <span th:text="${project.name}">Název projektu</span></li>
-    <li><b>Popis:</b> <span th:text="${project.description}">Popis projektu</span></li>
-    <li><b>Autor:</b> <span th:text="${project.creator.name}">Autor</span></li>
-    <li><b>Rozpočet:</b> <span th:text="${project.budget}">Rozpočet</span></li>
-    <li><b>Vytvořen:</b> <span th:text="${project.createdAt}">Datum vytvoření</span></li>
-</ul>
-
-<!-- Akce -->
-<a th:href="@{'/projects/edit/' + ${project.id}}">Editovat</a>
-<a th:href="@{'/projects/delete/' + ${project.id}}">Smazat</a>
+<div>
+    <b>ID:</b> <span th:text="${project.id}">1</span>
+</div>
+<div>
+    <b>Název:</b> <span th:text="${project.name}">Název projektu</span>
+</div>
+<div>
+    <b>Popis:</b> <span th:text="${project.description}">Popis projektu</span>
+</div>
+<a th:href="@{/projects}">Zpět na seznam projektů</a>
 </body>
 </html>

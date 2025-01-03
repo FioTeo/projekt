@@ -40,7 +40,6 @@ public class DataInitializer {
                 admin.setSurname("User");
                 admin.setEmail(adminEmail);
                 admin.setPassword(passwordEncoder.encode("adminpass"));
-                admin.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
                 Optional<Role> adminRole = roleRepository.findByName("ADMIN");
                 adminRole.ifPresent(role -> {
@@ -58,7 +57,6 @@ public class DataInitializer {
                 user.setSurname("User");
                 user.setEmail(userEmail);
                 user.setPassword(passwordEncoder.encode("userpass"));
-                user.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
                 // Assign USER role
                 Optional<Role> userRole = roleRepository.findByName("USER");

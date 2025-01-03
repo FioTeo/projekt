@@ -1,7 +1,8 @@
 package uhk.projekt.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Task;
 import uhk.projekt.service.TaskService;
@@ -12,68 +13,105 @@ import org.springframework.validation.BindingResult;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/tasks")
+@Controller
+@RequestMapping("/tasks")
 public class TaskController {
 
     @Autowired
     private TaskService taskService;
 
-    @PostMapping
-    public ResponseEntity<?> createTask(@Valid @RequestBody Task task, BindingResult result){
-        if(result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-        try{
-            Task createdTask = taskService.saveTask(task);
-            return ResponseEntity.ok(createdTask);
-        } catch(RuntimeException ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
+    /**
+     * Display all tasks.
+     */
     @GetMapping
-    public ResponseEntity<List<Task>> getAllTasks(){
+    public String listTasks(Model model) {
         List<Task> tasks = taskService.getAllTasks();
-        return ResponseEntity.ok(tasks);
+        model.addAttribute("tasks", tasks);
+        return "task/task_index"; // Corresponds to tasks.html
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Integer id){
+    /**
+     * Display details of a specific task.
+     */
+    @GetMapping("/detail/{id}")
+    public String taskDetail(@PathVariable Integer id, Model model) {
         Optional<Task> task = taskService.getTaskById(id);
-        return task.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<Task>> getTasksByProject(@PathVariable Integer projectId){
-        List<Task> tasks = taskService.getAllTasksByProject(projectId);
-        return ResponseEntity.ok(tasks);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<Task>> getTasksByUser(@PathVariable Integer userId){
-        List<Task> tasks = taskService.getAllTasksByUser(userId);
-        return ResponseEntity.ok(tasks);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable Integer id, @Valid @RequestBody Task task, BindingResult result){
-        if(result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-        try{
-            task.setId(id);
-            Task updatedTask = taskService.saveTask(task);
-            return ResponseEntity.ok(updatedTask);
-        } catch(RuntimeException ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        if (task.isPresent()) {
+            model.addAttribute("task", task.get());
+            return "task/task_detail"; // Corresponds to task_detail.html
+        } else {
+            return "redirect:/tasks?error=TaskNotFound";
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTask(@PathVariable Integer id){
-        taskService.deleteTaskById(id);
-        return ResponseEntity.noContent().build();
+    /**
+     * Show the form to create a new task.
+     */
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("task", new Task());
+        return "task/task_edit"; // Corresponds to task_edit.html
+    }
+
+    /**
+     * Handle form submission for creating a new task.
+     */
+    @PostMapping("/create")
+    public String createTask(@Valid @ModelAttribute("task") Task task, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "task/task_edit";
+        }
+        try {
+            taskService.saveTask(task);
+            return "redirect:/tasks?success=TaskCreated";
+        } catch (RuntimeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "task/task_edit";
+        }
+    }
+
+    /**
+     * Show the form to edit an existing task.
+     */
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        Optional<Task> task = taskService.getTaskById(id);
+        if (task.isPresent()) {
+            model.addAttribute("task", task.get());
+            return "task/task_edit"; // Reuse the same form for editing
+        } else {
+            return "redirect:/tasks?error=TaskNotFound";
+        }
+    }
+
+    /**
+     * Handle form submission for editing an existing task.
+     */
+    @PostMapping("/edit/{id}")
+    public String editTask(@PathVariable Integer id, @Valid @ModelAttribute("task") Task task, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "task/task_edit";
+        }
+        try {
+            task.setId(id); // Ensure the correct ID is set
+            taskService.saveTask(task);
+            return "redirect:/tasks?success=TaskUpdated";
+        } catch (RuntimeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "task/task_edit";
+        }
+    }
+
+    /**
+     * Delete a task.
+     */
+    @GetMapping("/delete/{id}")
+    public String deleteTask(@PathVariable Integer id) {
+        try {
+            taskService.deleteTaskById(id);
+            return "redirect:/tasks?success=TaskDeleted";
+        } catch (RuntimeException ex) {
+            return "redirect:/tasks?error=" + ex.getMessage();
+        }
     }
 }

@@ -6,17 +6,15 @@
 </head>
 <body>
 <h1>Detail zprávy</h1>
-
-<!-- Zobrazení detailů zprávy -->
-<ul>
-    <li><b>Text zprávy:</b> <span th:text="${message.message}">Text zprávy</span></li>
-    <li><b>Uživatel:</b> <span th:text="${message.user.name}">Jméno uživatele</span></li>
-    <li><b>Úkol:</b> <span th:text="${message.task.title}">Název úkolu</span></li>
-    <li><b>Vytvořeno:</b> <span th:text="${message.createdAt}">Datum vytvoření</span></li>
-</ul>
-
-<!-- Akce -->
-<a th:href="@{'/messages/edit/' + ${message.id}}">Editovat</a>
-<a th:href="@{'/messages/delete/' + ${message.id}}">Smazat</a>
+<div>
+    <b>ID:</b> <span th:text="${message.id}">1</span>
+</div>
+<div>
+    <b>Název:</b> <span th:text="${message.title}">Název zprávy</span>
+</div>
+<div>
+    <b>Obsah:</b> <span th:text="${message.content}">Obsah zprávy</span>
+</div>
+<a th:href="@{/messages}">Zpět na seznam zpráv</a>
 </body>
 </html>

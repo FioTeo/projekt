@@ -2,45 +2,34 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit TimeLog' : 'New TimeLog'}"></title>
+    <title th:if="${timeLog.id != null}">Editace uživatele</title>
+    <title th:if="${timeLog.id == null}">Vytvoření uživatele</title>
 </head>
 <body>
-<form th:object="${timeLog}" th:action="@{/time-logs/save}" method="post">
-    <label>
-        Popis:
-        <textarea th:field="*{description}"></textarea>
-        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
-    </label>
-    <br />
-    <label>
-        Uživatel:
-        <select th:field="*{user}">
-            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('user')}" th:errors="*{user}">Chyba u uživatele</span>
-    </label>
-    <br />
-    <label>
-        Úkol:
-        <select th:field="*{task}">
-            <option th:each="task : ${tasks}" th:value="${task}" th:text="${task.title}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('task')}" th:errors="*{task}">Chyba u úkolu</span>
-    </label>
-    <br />
-    <label>
-        Čas (hodiny):
-        <input type="number" step="0.01" th:field="*{time}" />
-        <span th:if="${#fields.hasErrors('time')}" th:errors="*{time}">Chyba u času</span>
-    </label>
-    <br />
-    <label>
-        Datum vytvoření:
-        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
-    </label>
-    <br />
-    <button type="submit">Uložit</button>
+<h1 th:if="${timeLog.id != null}">Editace uživatele</h1>
+<h1 th:if="${timeLog.id == null}">Vytvoření uživatele</h1>
+
+<!-- Error Message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Došlo k chybě.</p>
+</div>
+
+<form th:action="${timeLog.id != null} ? @{'/timelogs/edit/' + ${timeLog.id}} : @{/timelogs/create}" th:object="${timeLog}" method="post">
+    <div>
+        <label for="user">Uživatel:</label>
+        <input type="text" id="user" th:field="*{user}" required/>
+    </div>
+    <div>
+        <label for="task">Úkol:</label>
+        <input type="text" id="task" th:field="*{task}" required/>
+    </div>
+    <div>
+        <label for="hours">Hodiny:</label>
+        <input type="number" id="hours" th:field="*{hours}" required/>
+    </div>
+    <button type="submit" th:if="${timeLog.id != null}">Uložit změny</button>
+    <button type="submit" th:if="${timeLog.id == null}">Vytvořit</button>
 </form>
+<a th:href="@{/timelogs}">Zpět na seznam záznamů</a>
 </body>
 </html>

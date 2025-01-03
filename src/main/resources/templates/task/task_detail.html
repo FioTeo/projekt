@@ -2,47 +2,19 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Úkoly</title>
+    <title>Detail úkolu</title>
 </head>
 <body>
-<h1>Úkoly</h1>
-
-<a th:href="@{'/tasks/edit/' + ${task.id}}">Editovat</a>
-<a th:href="@{'/tasks/delete/' + ${task.id}}">Smazat</a>
-
-<!-- Detaily úkolu -->
-<ul>
-    <li>
-        <h2 th:text="${task.title}">Název úkolu</h2>
-        <div>
-            <b>Popis:</b>
-            <span th:text="${task.description}">Popis úkolu</span>
-        </div>
-        <div>
-            <b>Vytvořil:</b>
-            <span th:text="${task.creator.name}">Jméno autora</span>
-        </div>
-        <div>
-            <b>Řešitel:</b>
-            <span th:text="${task.solver.name}">Jméno řešitele</span>
-        </div>
-        <div>
-            <b>Priorita:</b>
-            <span th:text="${task.priority}">Priorita</span>
-        </div>
-    </li>
-</ul>
-
-<!-- Sekce seznamu úkolů -->
-<h2>Seznam úkolů</h2>
-<div class="tasks">
-    <ul>
-        <li th:each="task : ${tasks}">
-            <a th:href="@{'/tasks/detail/' + ${task.id}}">
-                <span th:text="${task.title}">Název úkolu</span>
-            </a>
-        </li>
-    </ul>
+<h1>Detail úkolu</h1>
+<div>
+    <b>ID:</b> <span th:text="${task.id}">1</span>
 </div>
+<div>
+    <b>Název:</b> <span th:text="${task.name}">Název úkolu</span>
+</div>
+<div>
+    <b>Popis:</b> <span th:text="${task.description}">Popis úkolu</span>
+</div>
+<a th:href="@{/tasks}">Zpět na seznam úkolů</a>
 </body>
 </html>

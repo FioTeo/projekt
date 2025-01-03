@@ -2,43 +2,30 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Project' : 'New Project'}"></title>
+    <title th:if="${project.id != null}">Editace uživatele</title>
+    <title th:if="${project.id == null}">Vytvoření uživatele</title>
 </head>
 <body>
-<form th:object="${project}" th:action="@{/project/save}" method="post">
-    <label>
-        Název:
-        <input type="text" th:field="*{name}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Chyba u názvu</span>
-    </label>
-    <br />
-    <label>
-        Popis:
-        <textarea th:field="*{description}"></textarea>
-        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
-    </label>
-    <br />
-    <label>
-        Rozpočet:
-        <input type="number" step="0.01" th:field="*{budget}" />
-        <span th:if="${#fields.hasErrors('budget')}" th:errors="*{budget}">Chyba u rozpočtu</span>
-    </label>
-    <br />
-    <label>
-        Autor:
-        <select th:field="*{creator}">
-            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('creator')}" th:errors="*{creator}">Chyba u autora</span>
-    </label>
-    <br />
-    <label>
-        Datum vytvoření:
-        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
-    </label>
-    <br />
-    <button type="submit">Uložit</button>
+<h1 th:if="${project.id != null}">Editace uživatele</h1>
+<h1 th:if="${project.id == null}">Vytvoření uživatele</h1>
+
+<!-- Error Message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Došlo k chybě.</p>
+</div>
+
+<form th:action="${project.id != null} ? @{'/projects/edit/' + ${project.id}} : @{/projects/create}" th:object="${project}" method="post">
+    <div>
+        <label for="name">Název:</label>
+        <input type="text" id="name" th:field="*{name}" required/>
+    </div>
+    <div>
+        <label for="description">Popis:</label>
+        <textarea id="description" th:field="*{description}" required></textarea>
+    </div>
+    <button type="submit" th:if="${project.id != null}">Uložit změny</button>
+    <button type="submit" th:if="${project.id == null}">Vytvořit</button>
 </form>
+<a th:href="@{/projects}">Zpět na seznam projektů</a>
 </body>
 </html>

@@ -2,41 +2,42 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit User' : 'New User'}"></title>
+    <title th:if="${user.id != null}">Editace uživatele</title>
+    <title th:if="${user.id == null}">Vytvoření uživatele</title>
 </head>
 <body>
-<form th:object="${user}" th:action="@{/user/save}" method="post">
-    <label>
-        Jméno:
-        <input type="text" th:field="*{name}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Chyba u jména</span>
-    </label>
-    <br />
-    <label>
-        Příjmení:
-        <input type="text" th:field="*{surname}" />
-        <span th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Chyba u příjmení</span>
-    </label>
-    <br />
-    <label>
-        Email:
-        <input type="email" th:field="*{email}" />
-        <span th:if="${#fields.hasErrors('email')}" th:errors="*{email}">Chyba u emailu</span>
-    </label>
-    <br />
-    <label>
-        Heslo:
-        <input type="password" th:field="*{password}" />
-        <span th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Chyba u hesla</span>
-    </label>
-    <br />
-    <label>
-        Datum vytvoření:
-        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
-    </label>
-    <br />
-    <button type="submit">Uložit</button>
+<h1 th:if="${user.id != null}">Editace uživatele</h1>
+<h1 th:if="${user.id == null}">Vytvoření uživatele</h1>
+
+<!-- Error Message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Došlo k chybě.</p>
+</div>
+
+<form th:action="${user.id != null} ? @{'/users/edit/' + ${user.id}} : @{/users/create}" th:object="${user}" method="post">
+    <div>
+        <label for="name">Jméno:</label>
+        <input type="text" id="name" th:field="*{name}" required maxlength="50"/>
+    </div>
+    <div>
+        <label for="surname">Příjmení:</label>
+        <input type="text" id="surname" th:field="*{surname}" required maxlength="50"/>
+    </div>
+    <div>
+        <label for="email">Email:</label>
+        <input type="email" id="email" th:field="*{email}" required maxlength="100"/>
+    </div>
+    <div>
+        <label for="password">Heslo:</label>
+        <input type="password" id="password" th:field="*{password}"
+               th:placeholder="${user.id != null} ? 'Zadejte nové heslo nebo ponechte prázdné' : ''"/>
+    </div>
+
+    <!-- Separate Button Logic -->
+    <button type="submit" th:if="${user.id != null}">Uložit změny</button>
+    <button type="submit" th:if="${user.id == null}">Vytvořit</button>
 </form>
+
+<a th:href="@{/users}">Zpět na seznam uživatelů</a>
 </body>
 </html>

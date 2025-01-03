@@ -2,34 +2,25 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Uživatelé</title>
+    <title>Detail uživatele</title>
 </head>
 <body>
-<h1>Uživatelé</h1>
-
-<!-- Odkazy na editaci a smazání uživatele -->
-<a th:href="@{'/users/edit/' + ${user.id}}">Editovat</a>
-<a th:href="@{'/users/delete/' + ${user.id}}">Smazat</a>
-
-<!-- Detaily uživatele -->
-<ul>
-    <li><b>Jméno:</b> <span th:text="${user.name}">Jméno uživatele</span></li>
-    <li><b>Příjmení:</b> <span th:text="${user.surname}">Příjmení uživatele</span></li>
-    <li><b>Email:</b> <span th:text="${user.email}">Email uživatele</span></li>
-    <li><b>Role:</b> <span th:text="${user.role}">Role uživatele</span></li>
-</ul>
-
-<!-- Seznam úkolů přiřazených uživateli -->
-<h2>Přiřazené úkoly</h2>
-<div class="tasks">
-    <ul>
-        <li th:each="task : ${tasks}">
-            <a th:href="@{'/tasks/detail/' + ${task.id}}">
-                <span th:text="${task.title}">Název úkolu</span>
-            </a>
-        </li>
-    </ul>
+<h1>Detail uživatele</h1>
+<div>
+    <b>ID:</b> <span th:text="${user.id}">1</span>
 </div>
-
+<div>
+    <b>Jméno:</b> <span th:text="${user.name}">Jméno</span>
+</div>
+<div>
+    <b>Příjmení:</b> <span th:text="${user.surname}">Příjmení</span>
+</div>
+<div>
+    <b>Email:</b> <span th:text="${user.email}">email@example.com</span>
+</div>
+<div>
+    <b>Datum vytvoření:</b> <span th:text="${user.createdAt}">2025-01-03</span>
+</div>
+<a th:href="@{/users}">Zpět na seznam uživatelů</a>
 </body>
 </html>

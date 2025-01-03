@@ -2,27 +2,41 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Zprávy</title>
+    <title>Seznam zpráv</title>
 </head>
 <body>
-<h1>Zprávy</h1>
-<ul>
-    <li th:each="message : ${messages}">
-        <!-- Odkaz na detail zprávy -->
-        <a th:href="@{'/messages/detail/' + ${message.id}}">
-            <span th:text="${message.message}">Text zprávy</span>
-        </a>
-        <!-- Další informace -->
-        <div>
-            <b>Uživatel:</b> <span th:text="${message.user.name}">Jméno uživatele</span>
-        </div>
-        <div>
-            <b>Úkol:</b> <span th:text="${message.task.title}">Název úkolu</span>
-        </div>
-        <div>
-            <b>Vytvořeno:</b> <span th:text="${message.createdAt}">Datum</span>
-        </div>
-    </li>
-</ul>
+<h1>Seznam zpráv</h1>
+
+<!-- Success and Error Messages -->
+<div th:if="${param.success}" style="color: green;">
+    <p th:text="${param.success}">Akce byla úspěšná.</p>
+</div>
+<div th:if="${param.error}" style="color: red;">
+    <p th:text="${param.error}">Došlo k chybě.</p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Název</th>
+        <th>Obsah</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="message : ${messages}">
+        <td th:text="${message.id}">1</td>
+        <td th:text="${message.title}">Název</td>
+        <td th:text="${message.content}">Obsah</td>
+        <td>
+            <a th:href="@{'/messages/detail/' + ${message.id}}">Detail</a> |
+            <a th:href="@{'/messages/edit/' + ${message.id}}">Editovat</a> |
+            <a th:href="@{'/messages/delete/' + ${message.id}}" onclick="return confirm('Opravdu chcete smazat tuto zprávu?');">Smazat</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/messages/create}">Vytvořit novou zprávu</a>
 </body>
 </html>

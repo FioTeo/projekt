@@ -2,39 +2,30 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Message' : 'New Message'}"></title>
+    <title th:if="${message.id != null}">Editace uživatele</title>
+    <title th:if="${message.id == null}">Vytvoření uživatele</title>
 </head>
 <body>
-<form th:object="${message}" th:action="@{/messages/save}" method="post">
-    <label>
-        Text zprávy:
-        <textarea th:field="*{message}"></textarea>
-        <span th:if="${#fields.hasErrors('message')}" th:errors="*{message}">Chyba u textu zprávy</span>
-    </label>
-    <br />
-    <label>
-        Uživatel:
-        <select th:field="*{user}">
-            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('user')}" th:errors="*{user}">Chyba u uživatele</span>
-    </label>
-    <br />
-    <label>
-        Úkol:
-        <select th:field="*{task}">
-            <option th:each="task : ${tasks}" th:value="${task}" th:text="${task.title}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('task')}" th:errors="*{task}">Chyba u úkolu</span>
-    </label>
-    <br />
-    <label>
-        Datum vytvoření:
-        <input type="datetime-local" th:field="*{createdAt}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('createdAt')}" th:errors="*{createdAt}">Chyba u datumu</span>
-    </label>
-    <br />
-    <button type="submit">Uložit</button>
+<h1 th:if="${message.id != null}">Editace uživatele</h1>
+<h1 th:if="${message.id == null}">Vytvoření uživatele</h1>
+
+<!-- Error Message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Došlo k chybě.</p>
+</div>
+
+<form th:action="${message.id != null} ? @{'/messages/edit/' + ${message.id}} : @{/messages/create}" th:object="${message}" method="post">
+    <div>
+        <label for="title">Název:</label>
+        <input type="text" id="title" th:field="*{title}" required/>
+    </div>
+    <div>
+        <label for="content">Obsah:</label>
+        <textarea id="content" th:field="*{content}" required></textarea>
+    </div>
+    <button type="submit" th:if="${message.id != null}">Uložit změny</button>
+    <button type="submit" th:if="${message.id == null}">Vytvořit</button>
 </form>
+<a th:href="@{/messages}">Zpět na seznam zpráv</a>
 </body>
 </html>

@@ -2,30 +2,43 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Časové záznamy</title>
+    <title>Seznam časových záznamů</title>
 </head>
 <body>
-<h1>Časové záznamy</h1>
-<ul>
-    <li th:each="timeLog : ${timeLogs}">
-        <!-- Odkaz na detail záznamu -->
-        <a th:href="@{'/time-logs/detail/' + ${timeLog.id}}">
-            <span th:text="${timeLog.description}">Popis záznamu</span>
-        </a>
-        <!-- Další informace -->
-        <div>
-            <b>Uživatel:</b> <span th:text="${timeLog.user.name}">Jméno uživatele</span>
-        </div>
-        <div>
-            <b>Úkol:</b> <span th:text="${timeLog.task.title}">Název úkolu</span>
-        </div>
-        <div>
-            <b>Čas:</b> <span th:text="${timeLog.time}">Hodiny</span>
-        </div>
-        <div>
-            <b>Vytvořeno:</b> <span th:text="${timeLog.createdAt}">Datum</span>
-        </div>
-    </li>
-</ul>
+<h1>Seznam časových záznamů</h1>
+
+<!-- Success and Error Messages -->
+<div th:if="${param.success}" style="color: green;">
+    <p th:text="${param.success}">Akce byla úspěšná.</p>
+</div>
+<div th:if="${param.error}" style="color: red;">
+    <p th:text="${param.error}">Došlo k chybě.</p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Uživatel</th>
+        <th>Úkol</th>
+        <th>Hodiny</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="timeLog : ${timeLogs}">
+        <td th:text="${timeLog.id}">1</td>
+        <td th:text="${timeLog.user}">Uživatel</td>
+        <td th:text="${timeLog.task}">Úkol</td>
+        <td th:text="${timeLog.hours}">Hodiny</td>
+        <td>
+            <a th:href="@{'/timelogs/detail/' + ${timeLog.id}}">Detail</a> |
+            <a th:href="@{'/timelogs/edit/' + ${timeLog.id}}">Editovat</a> |
+            <a th:href="@{'/timelogs/delete/' + ${timeLog.id}}" onclick="return confirm('Opravdu chcete smazat tento záznam?');">Smazat</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/timelogs/create}">Vytvořit nový záznam</a>
 </body>
 </html>

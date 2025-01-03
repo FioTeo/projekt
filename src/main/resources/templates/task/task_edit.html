@@ -2,45 +2,30 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:text="${edit ? 'Edit Task' : 'New Task'}"></title>
+    <title th:if="${task.id != null}">Editace uživatele</title>
+    <title th:if="${task.id == null}">Vytvoření uživatele</title>
 </head>
 <body>
-<form th:object="${task}" th:action="@{/task/save}" method="post">
-    <label>
-        Název úkolu:
-        <input type="text" th:field="*{title}" th:readonly="${edit}" />
-        <span th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Chyba u názvu</span>
-    </label>
-    <br />
-    <label>
-        Popis:
-        <textarea th:field="*{description}"></textarea>
-        <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Chyba u popisu</span>
-    </label>
-    <br />
-    <label>
-        Autor:
-        <select th:field="*{creator}">
-            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('creator')}" th:errors="*{creator}">Chyba u autora</span>
-    </label>
-    <br />
-    <label>
-        Řešitel:
-        <select th:field="*{solver}">
-            <option th:each="user : ${users}" th:value="${user}" th:text="${user.name}"></option>
-        </select>
-        <span th:if="${#fields.hasErrors('solver')}" th:errors="*{solver}">Chyba u řešitele</span>
-    </label>
-    <br />
-    <label>
-        Priorita:
-        <input type="number" th:field="*{priority}" />
-        <span th:if="${#fields.hasErrors('priority')}" th:errors="*{priority}">Chyba u priority</span>
-    </label>
-    <br />
-    <button type="submit">Uložit</button>
+<h1 th:if="${task.id != null}">Editace uživatele</h1>
+<h1 th:if="${task.id == null}">Vytvoření uživatele</h1>
+
+<!-- Error Message -->
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Došlo k chybě.</p>
+</div>
+
+<form th:action="${task.id != null} ? @{'/tasks/edit/' + ${task.id}} : @{/tasks/create}" th:object="${task}" method="post">
+    <div>
+        <label for="name">Název:</label>
+        <input type="text" id="name" th:field="*{name}" required/>
+    </div>
+    <div>
+        <label for="description">Popis:</label>
+        <textarea id="description" th:field="*{description}" required></textarea>
+    </div>
+    <button type="submit" th:if="${task.id != null}">Uložit změny</button>
+    <button type="submit" th:if="${task.id == null}">Vytvořit</button>
 </form>
+<a th:href="@{/tasks}">Zpět na seznam úkolů</a>
 </body>
 </html>

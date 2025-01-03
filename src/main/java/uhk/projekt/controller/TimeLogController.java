@@ -1,7 +1,8 @@
 package uhk.projekt.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.TimeLog;
 import uhk.projekt.service.TimeLogService;
@@ -12,74 +13,105 @@ import org.springframework.validation.BindingResult;
 import java.util.List;
 import java.util.Optional;
 
-@RestController
-@RequestMapping("/api/timelogs")
+@Controller
+@RequestMapping("/time_logs")
 public class TimeLogController {
 
     @Autowired
     private TimeLogService timeLogService;
 
-    @PostMapping
-    public ResponseEntity<?> createTimeLog(@Valid @RequestBody TimeLog timeLog, BindingResult result){
-        if(result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-        try{
-            TimeLog createdTimeLog = timeLogService.saveTimeLog(timeLog);
-            return ResponseEntity.ok(createdTimeLog);
-        } catch(RuntimeException ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        }
-    }
-
+    /**
+     * Display all time logs.
+     */
     @GetMapping
-    public ResponseEntity<List<TimeLog>> getAllTimeLogs(){
+    public String listTimeLogs(Model model) {
         List<TimeLog> timeLogs = timeLogService.getAllTimeLogs();
-        return ResponseEntity.ok(timeLogs);
+        model.addAttribute("timeLogs", timeLogs);
+        return "time_log/time_logs"; // Corresponds to timelogs.html
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TimeLog> getTimeLogById(@PathVariable Integer id){
+    /**
+     * Display details of a specific time log.
+     */
+    @GetMapping("/detail/{id}")
+    public String timeLogDetail(@PathVariable Integer id, Model model) {
         Optional<TimeLog> timeLog = timeLogService.getTimeLogById(id);
-        return timeLog.map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<TimeLog>> getTimeLogsByUser(@PathVariable Integer userId){
-        List<TimeLog> timeLogs = timeLogService.getAllTimeLogsByUser(userId);
-        return ResponseEntity.ok(timeLogs);
-    }
-
-    @GetMapping("/task/{taskId}")
-    public ResponseEntity<List<TimeLog>> getTimeLogsByTask(@PathVariable Integer taskId){
-        List<TimeLog> timeLogs = timeLogService.getAllTimeLogsByTask(taskId);
-        return ResponseEntity.ok(timeLogs);
-    }
-
-    @GetMapping("/project/{projectId}")
-    public ResponseEntity<List<TimeLog>> getTimeLogsByProject(@PathVariable Integer projectId){
-        List<TimeLog> timeLogs = timeLogService.getAllTimeLogsByProject(projectId);
-        return ResponseEntity.ok(timeLogs);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateTimeLog(@PathVariable Integer id, @Valid @RequestBody TimeLog timeLog, BindingResult result){
-        if(result.hasErrors()){
-            return ResponseEntity.badRequest().body(result.getAllErrors());
-        }
-        try{
-            timeLog.setId(id);
-            TimeLog updatedTimeLog = timeLogService.saveTimeLog(timeLog);
-            return ResponseEntity.ok(updatedTimeLog);
-        } catch(RuntimeException ex){
-            return ResponseEntity.badRequest().body(ex.getMessage());
+        if (timeLog.isPresent()) {
+            model.addAttribute("timeLog", timeLog.get());
+            return "time_log_detail"; // Corresponds to timelog_detail.html
+        } else {
+            return "redirect:/time_log?error=TimeLogNotFound";
         }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteTimeLog(@PathVariable Integer id){
-        timeLogService.deleteTimeLogById(id);
-        return ResponseEntity.noContent().build();
+    /**
+     * Show the form to create a new time log.
+     */
+    @GetMapping("/create")
+    public String showCreateForm(Model model) {
+        model.addAttribute("timeLog", new TimeLog());
+        return "time_log_edit"; // Corresponds to timelog_form.html
+    }
+
+    /**
+     * Handle form submission for creating a new time log.
+     */
+    @PostMapping("/create")
+    public String createTimeLog(@Valid @ModelAttribute("timeLog") TimeLog timeLog, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "time_log_edit";
+        }
+        try {
+            timeLogService.saveTimeLog(timeLog);
+            return "redirect:/time_logs?success=TimeLogCreated";
+        } catch (RuntimeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "time_log_edit";
+        }
+    }
+
+    /**
+     * Show the form to edit an existing time log.
+     */
+    @GetMapping("/edit/{id}")
+    public String showEditForm(@PathVariable Integer id, Model model) {
+        Optional<TimeLog> timeLog = timeLogService.getTimeLogById(id);
+        if (timeLog.isPresent()) {
+            model.addAttribute("timeLog", timeLog.get());
+            return "time_log/time_log_edit"; // Reuse the same form for editing
+        } else {
+            return "redirect:/time_logs?error=TimeLogNotFound";
+        }
+    }
+
+    /**
+     * Handle form submission for editing an existing time log.
+     */
+    @PostMapping("/edit/{id}")
+    public String editTimeLog(@PathVariable Integer id, @Valid @ModelAttribute("timeLog") TimeLog timeLog, BindingResult result, Model model) {
+        if (result.hasErrors()) {
+            return "time_log_edit";
+        }
+        try {
+            timeLog.setId(id); // Ensure the correct ID is set
+            timeLogService.saveTimeLog(timeLog);
+            return "redirect:/time_logs?success=TimeLogUpdated";
+        } catch (RuntimeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
+            return "time_log/time_log_edit";
+        }
+    }
+
+    /**
+     * Delete a time log.
+     */
+    @GetMapping("/delete/{id}")
+    public String deleteTimeLog(@PathVariable Integer id) {
+        try {
+            timeLogService.deleteTimeLogById(id);
+            return "redirect:/time_logs?success=TimeLogDeleted";
+        } catch (RuntimeException ex) {
+            return "redirect:/time_logs?error=" + ex.getMessage();
+        }
     }
 }

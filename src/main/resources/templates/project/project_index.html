@@ -2,25 +2,41 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Projekty</title>
+    <title>Seznam projektů</title>
 </head>
 <body>
-<h1>Projekty</h1>
+<h1>Seznam projektů</h1>
 
-<ul>
-    <li th:each="project : ${projects}">
-        <!-- Odkaz na detail projektu -->
-        <a th:href="@{'/projects/detail/' + ${project.id}}">
-            <span th:text="${project.name}">Název projektu</span>
-        </a>
-        <!-- Zobrazení rozpočtu a autora -->
-        <div>
-            <b>Rozpočet:</b> <span th:text="${project.budget}">Rozpočet</span>
-        </div>
-        <div>
-            <b>Vytvořil:</b> <span th:text="${project.creator.name}">Autor</span>
-        </div>
-    </li>
-</ul>
+<!-- Success and Error Messages -->
+<div th:if="${param.success}" style="color: green;">
+    <p th:text="${param.success}">Akce byla úspěšná.</p>
+</div>
+<div th:if="${param.error}" style="color: red;">
+    <p th:text="${param.error}">Došlo k chybě.</p>
+</div>
+
+<table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Název</th>
+        <th>Popis</th>
+        <th>Akce</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="project : ${projects}">
+        <td th:text="${project.id}">1</td>
+        <td th:text="${project.name}">Název</td>
+        <td th:text="${project.description}">Popis</td>
+        <td>
+            <a th:href="@{'/projects/detail/' + ${project.id}}">Detail</a> |
+            <a th:href="@{'/projects/edit/' + ${project.id}}">Editovat</a> |
+            <a th:href="@{'/projects/delete/' + ${project.id}}" onclick="return confirm('Opravdu chcete smazat tento projekt?');">Smazat</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+<a th:href="@{/projects/create}">Vytvořit nový projekt</a>
 </body>
 </html>
