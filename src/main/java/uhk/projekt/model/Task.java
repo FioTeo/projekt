@@ -3,6 +3,8 @@ package uhk.projekt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "tasks")
 public class Task {
@@ -38,17 +40,23 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    private Project project;
+
+
     public Task() {
 
     }
 
-    public Task(int id, String title, String description, User creator, User solver, int priority) {
+    public Task(int id, String title, String description, User creator, User solver, int priority, Project project) {
         this.id = id;
         this.title = title;
         this.description = description;
         this.creator = creator;
         this.solver = solver;
         this.priority = priority;
+        this.project = project;
     }
 
     public int getId() {
@@ -97,5 +105,13 @@ public class Task {
 
     public void setPriority(int priority) {
         this.priority = priority;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
     }
 }

@@ -42,7 +42,6 @@ public class TaskServiceImp implements TaskService {
     @Override
     @Transactional
     public Task saveTask(Task task) {
-        // Můžete přidat další logiku, např. validace
         return taskRepository.save(task);
     }
 

@@ -18,7 +18,7 @@ public class MessageServiceImp implements MessageService {
     private MessageRepository messageRepository;
 
     @Autowired
-    private TaskRepository taskRepository; // Potřebné pro získání projektů přes úkoly
+    private TaskRepository taskRepository;
 
     @Override
     @Transactional(readOnly = true)

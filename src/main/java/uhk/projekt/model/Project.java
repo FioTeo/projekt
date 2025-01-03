@@ -3,6 +3,8 @@ package uhk.projekt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 @Entity
 @Table(name = "projects")
 public class Project {
@@ -37,7 +39,7 @@ public class Project {
     public Project() {
     }
 
-    public Project(int id, String name, String description, User creator, float budget, String createdAt) {
+    public Project(int id, String name, String description, User creator, int budget, String createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -62,11 +64,11 @@ public class Project {
         this.name = name;
     }
 
-    public String getdescription() {
+    public String getDescription() {
         return description;
     }
 
-    public void setdescription(String description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
@@ -82,7 +84,7 @@ public class Project {
         return budget;
     }
 
-    public void setBudget(float budget) {
+    public void setBudget(int budget) {
         this.budget = budget;
     }
 
