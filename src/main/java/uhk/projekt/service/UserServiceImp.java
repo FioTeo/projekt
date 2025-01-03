@@ -6,6 +6,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.User;
 import uhk.projekt.repository.UserRepository;
+import uhk.projekt.security.SecurityConfig;
+import uhk.projekt.security.SharedConfig;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,7 +19,7 @@ public class UserServiceImp implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private BCryptPasswordEncoder passwordEncoder; // Pro hashování hesel
+    private SharedConfig sharedConfig; // Pro hashování hesel
 
     @Override
     @Transactional(readOnly = true)
@@ -41,7 +43,7 @@ public class UserServiceImp implements UserService {
     @Transactional
     public User saveUser(User user) {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
-            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            user.setPassword(user.getPassword());
         }
         return userRepository.save(user);
     }

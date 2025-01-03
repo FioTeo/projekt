@@ -58,7 +58,6 @@ public class UserController {
             return ResponseEntity.badRequest().body(result.getAllErrors());
         }
         try{
-            user.setId(id);
             User updatedUser = userService.saveUser(user);
             return ResponseEntity.ok(updatedUser);
         } catch(RuntimeException ex){
