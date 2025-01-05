@@ -1,31 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:if="${project.id != null}">Editace uživatele</title>
-    <title th:if="${project.id == null}">Vytvoření uživatele</title>
+    <title th:text="${project.id != null} ? 'Editace projektu' : 'Vytvoření projektu'">Formulář projektu</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1 th:if="${project.id != null}">Editace uživatele</h1>
-<h1 th:if="${project.id == null}">Vytvoření uživatele</h1>
+<div class="container mt-5">
+    <!-- Nadpis -->
+    <h1 class="mb-4 text-center" th:text="${project.id != null} ? 'Editace projektu' : 'Vytvoření projektu'">Formulář projektu</h1>
 
-<!-- Error Message -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}">Došlo k chybě.</p>
+    <!-- Zpráva o chybě -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}">Došlo k chybě.</p>
+    </div>
+
+    <!-- Formulář -->
+    <form th:action="${project.id != null} ? @{/projects/edit/{id}(id=${project.id})} : @{/projects/create}"
+          th:object="${project}" method="post" class="row g-3">
+        <!-- Skryté pole pro ID (pouze při editaci) -->
+        <div th:if="${project.id != null}">
+            <input type="hidden" th:field="*{id}" />
+        </div>
+
+        <!-- Název projektu -->
+        <div class="col-md-12">
+            <label for="name" class="form-label">Název:</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" placeholder="Zadejte název projektu" required/>
+            <div th:if="${#fields.hasErrors('name')}" class="text-danger" th:errors="*{name}">Chyba v názvu projektu</div>
+        </div>
+
+        <!-- Popis projektu -->
+        <div class="col-md-12">
+            <label for="description" class="form-label">Popis:</label>
+            <textarea id="description" th:field="*{description}" class="form-control" placeholder="Popis projektu" required></textarea>
+            <div th:if="${#fields.hasErrors('description')}" class="text-danger" th:errors="*{description}">Chyba v popisu projektu</div>
+        </div>
+
+        <!-- Rozpočet -->
+        <div class="col-md-12">
+            <label for="budget" class="form-label">Rozpočet:</label>
+            <input type="number" id="budget" th:field="*{budget}" class="form-control" placeholder="Zadejte rozpočet" required/>
+            <div th:if="${#fields.hasErrors('budget')}" class="text-danger" th:errors="*{budget}">Chyba v rozpočtu</div>
+        </div>
+
+        <!-- Tlačítka -->
+        <div class="col-12 d-flex justify-content-between mt-4">
+            <a th:href="@{/projects}" class="btn btn-secondary">Zpět na seznam projektů</a>
+            <button type="submit" class="btn btn-primary" th:text="${project.id != null} ? 'Uložit změny' : 'Vytvořit'">Odeslat</button>
+        </div>
+    </form>
 </div>
 
-<form th:action="${project.id != null} ? @{'/projects/edit/' + ${project.id}} : @{/projects/create}" th:object="${project}" method="post">
-    <div>
-        <label for="name">Název:</label>
-        <input type="text" id="name" th:field="*{name}" required/>
-    </div>
-    <div>
-        <label for="description">Popis:</label>
-        <textarea id="description" th:field="*{description}" required></textarea>
-    </div>
-    <button type="submit" th:if="${project.id != null}">Uložit změny</button>
-    <button type="submit" th:if="${project.id == null}">Vytvořit</button>
-</form>
-<a th:href="@{/projects}">Zpět na seznam projektů</a>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

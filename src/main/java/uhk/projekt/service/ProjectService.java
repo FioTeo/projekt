@@ -8,6 +8,6 @@ import java.util.Optional;
 public interface ProjectService {
     List<Project> getAllProjects();
     Optional<Project> getProjectById(Integer id);
-    Project saveProject(Project project);
+    void saveProject(Project project);
     void deleteProjectById(Integer id);
 }

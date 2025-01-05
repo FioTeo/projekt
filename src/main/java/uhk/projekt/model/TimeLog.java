@@ -3,13 +3,15 @@ package uhk.projekt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "time_logs")
 public class TimeLog {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "task_id", nullable = false)
@@ -28,14 +30,14 @@ public class TimeLog {
     @Column(nullable = false)
     private float time;
 
-    @Column(nullable = false)
-    private String createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public TimeLog() {
 
     }
 
-    public TimeLog(int id, Task task, User user, String description, float time, String createdAt) {
+    public TimeLog(Integer id, Task task, User user, String description, float time, LocalDateTime createdAt) {
         this.id = id;
         this.task = task;
         this.user = user;
@@ -44,11 +46,11 @@ public class TimeLog {
         this.createdAt = createdAt;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -84,11 +86,7 @@ public class TimeLog {
         this.time = time;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
-    }
-
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
     }
 }

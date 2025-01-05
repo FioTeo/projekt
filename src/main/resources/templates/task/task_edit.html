@@ -1,31 +1,61 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:if="${task.id != null}">Editace uživatele</title>
-    <title th:if="${task.id == null}">Vytvoření uživatele</title>
+    <title>Editace Úkolu</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1 th:if="${task.id != null}">Editace uživatele</h1>
-<h1 th:if="${task.id == null}">Vytvoření uživatele</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Editace Úkolu</h1>
 
-<!-- Error Message -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}">Došlo k chybě.</p>
+    <!-- Zpráva o chybě -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}">Došlo k chybě.</p>
+    </div>
+
+    <!-- Formulář -->
+    <form th:action="@{/tasks/edit/{id}(id=${task.id})}" th:object="${task}" method="post" class="needs-validation" novalidate>
+        <div class="mb-3">
+            <label for="name" class="form-label">Název úkolu:</label>
+            <input type="text" id="name" th:field="*{name}" class="form-control" required placeholder="Zadejte název úkolu">
+            <div class="invalid-feedback">Název úkolu je povinný.</div>
+        </div>
+        <div class="mb-3">
+            <label for="description" class="form-label">Popis úkolu:</label>
+            <textarea id="description" th:field="*{description}" class="form-control" required placeholder="Zadejte popis úkolu"></textarea>
+            <div class="invalid-feedback">Popis úkolu je povinný.</div>
+        </div>
+        <div class="mb-3">
+            <label for="priority" class="form-label">Priorita:</label>
+            <input type="number" id="priority" th:field="*{priority}" class="form-control" min="1" required placeholder="Zadejte prioritu">
+            <div class="invalid-feedback">Priorita musí být číslo větší než 0.</div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a th:href="@{/tasks}" class="btn btn-secondary">Zpět na seznam úkolů</a>
+            <button type="submit" class="btn btn-primary">Uložit</button>
+        </div>
+    </form>
 </div>
 
-<form th:action="${task.id != null} ? @{'/tasks/edit/' + ${task.id}} : @{/tasks/create}" th:object="${task}" method="post">
-    <div>
-        <label for="name">Název:</label>
-        <input type="text" id="name" th:field="*{name}" required/>
-    </div>
-    <div>
-        <label for="description">Popis:</label>
-        <textarea id="description" th:field="*{description}" required></textarea>
-    </div>
-    <button type="submit" th:if="${task.id != null}">Uložit změny</button>
-    <button type="submit" th:if="${task.id == null}">Vytvořit</button>
-</form>
-<a th:href="@{/tasks}">Zpět na seznam úkolů</a>
+<!-- Bootstrap JS a závislosti -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    (function () {
+        'use strict'
+        const forms = document.querySelectorAll('.needs-validation')
+        Array.from(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
+</script>
 </body>
 </html>

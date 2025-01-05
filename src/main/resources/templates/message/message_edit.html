@@ -1,31 +1,39 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:if="${message.id != null}">Editace uživatele</title>
-    <title th:if="${message.id == null}">Vytvoření uživatele</title>
+    <title th:text="${message.id != null} ? 'Editovat Zprávu' : 'Vytvořit Zprávu'">Formulář Zprávy</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1 th:if="${message.id != null}">Editace uživatele</h1>
-<h1 th:if="${message.id == null}">Vytvoření uživatele</h1>
+<div class="container mt-5">
+    <!-- Nadpis -->
+    <h1 class="mb-4 text-center" th:text="${message.id != null} ? 'Editovat Zprávu' : 'Vytvořit Zprávu'">Formulář Zprávy</h1>
 
-<!-- Error Message -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}">Došlo k chybě.</p>
+    <!-- Zobrazení Chybové Zprávy -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}">Došlo k chybě.</p>
+    </div>
+
+    <!-- Formulář -->
+    <form th:action="@{${message.id != null} ? '/messages/edit/' + ${message.id} + '?taskId=' + ${taskId} : '/messages/create?taskId=' + ${taskId}}"
+          th:object="${message}" method="post" class="row g-3">
+
+        <!-- Pole pro zprávu -->
+        <div class="col-md-12">
+            <label for="message" class="form-label">Zpráva</label>
+            <textarea id="message" th:field="*{message}" class="form-control" placeholder="Zadejte obsah zprávy" required></textarea>
+            <div th:if="${#fields.hasErrors('message')}" class="text-danger" th:errors="*{message}">Chyba ve zprávě</div>
+        </div>
+
+        <!-- Tlačítka -->
+        <div class="col-12 d-flex justify-content-between mt-4">
+            <a th:href="@{/messages}" class="btn btn-secondary">Zrušit</a>
+            <button type="submit" class="btn btn-primary" th:text="${message.id != null} ? 'Uložit Změny' : 'Vytvořit'}">Odeslat</button>
+        </div>
+    </form>
 </div>
 
-<form th:action="${message.id != null} ? @{'/messages/edit/' + ${message.id}} : @{/messages/create}" th:object="${message}" method="post">
-    <div>
-        <label for="title">Název:</label>
-        <input type="text" id="title" th:field="*{title}" required/>
-    </div>
-    <div>
-        <label for="content">Obsah:</label>
-        <textarea id="content" th:field="*{content}" required></textarea>
-    </div>
-    <button type="submit" th:if="${message.id != null}">Uložit změny</button>
-    <button type="submit" th:if="${message.id == null}">Vytvořit</button>
-</form>
-<a th:href="@{/messages}">Zpět na seznam zpráv</a>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

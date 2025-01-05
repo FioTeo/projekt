@@ -29,8 +29,8 @@ public class ProjectServiceImp implements ProjectService {
 
     @Override
     @Transactional
-    public Project saveProject(Project project) {
-        return projectRepository.save(project);
+    public void saveProject(Project project) {
+        projectRepository.save(project);
     }
 
     @Override

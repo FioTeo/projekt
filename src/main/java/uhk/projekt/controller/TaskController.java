@@ -35,7 +35,7 @@ public class TaskController {
      */
     @GetMapping("/detail/{id}")
     public String taskDetail(@PathVariable Integer id, Model model) {
-        Optional<Task> task = taskService.getTaskById(id);
+        Optional<Task> task = taskService.getTaskByIdWithProject(id);
         if (task.isPresent()) {
             model.addAttribute("task", task.get());
             return "task/task_detail"; // Corresponds to task_detail.html
@@ -45,39 +45,14 @@ public class TaskController {
     }
 
     /**
-     * Show the form to create a new task.
-     */
-    @GetMapping("/create")
-    public String showCreateForm(Model model) {
-        model.addAttribute("task", new Task());
-        return "task/task_edit"; // Corresponds to task_edit.html
-    }
-
-    /**
-     * Handle form submission for creating a new task.
-     */
-    @PostMapping("/create")
-    public String createTask(@Valid @ModelAttribute("task") Task task, BindingResult result, Model model) {
-        if (result.hasErrors()) {
-            return "task/task_edit";
-        }
-        try {
-            taskService.saveTask(task);
-            return "redirect:/tasks?success=TaskCreated";
-        } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "task/task_edit";
-        }
-    }
-
-    /**
      * Show the form to edit an existing task.
      */
     @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Integer id, Model model) {
-        Optional<Task> task = taskService.getTaskById(id);
-        if (task.isPresent()) {
-            model.addAttribute("task", task.get());
+        Optional<Task> taskOpt = taskService.getTaskByIdWithProject(id);
+        if (taskOpt.isPresent()) {
+            Task task = taskOpt.get();
+            model.addAttribute("task", task);
             return "task/task_edit"; // Reuse the same form for editing
         } else {
             return "redirect:/tasks?error=TaskNotFound";
@@ -88,14 +63,30 @@ public class TaskController {
      * Handle form submission for editing an existing task.
      */
     @PostMapping("/edit/{id}")
-    public String editTask(@PathVariable Integer id, @Valid @ModelAttribute("task") Task task, BindingResult result, Model model) {
+    public String editTask(@PathVariable Integer id,
+                           @Valid @ModelAttribute("task") Task task,
+                           BindingResult result,
+                           Model model) {
         if (result.hasErrors()) {
             return "task/task_edit";
         }
         try {
-            task.setId(id); // Ensure the correct ID is set
-            taskService.saveTask(task);
-            return "redirect:/tasks?success=TaskUpdated";
+            // Načtěte existující úkol spolu s projektem
+            Optional<Task> existingTaskOpt = taskService.getTaskByIdWithProject(id);
+            if (existingTaskOpt.isPresent()) {
+                Task existingTask = existingTaskOpt.get();
+                // Aktualizujte pouze relevantní pole
+                existingTask.setName(task.getName());
+                existingTask.setDescription(task.getDescription());
+                existingTask.setPriority(task.getPriority());
+                // Pokud chcete umožnit změnu projektu, musíte přidat logiku zde
+
+                taskService.saveTask(existingTask);
+                return "redirect:/tasks?success=TaskUpdated";
+            } else {
+                model.addAttribute("errorMessage", "Úkol nebyl nalezen.");
+                return "redirect:/tasks?error=TaskNotFound";
+            }
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
             return "task/task_edit";

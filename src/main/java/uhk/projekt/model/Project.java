@@ -3,6 +3,7 @@ package uhk.projekt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -11,7 +12,7 @@ public class Project {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Název projektu je povinný")
     @Size(max = 100, message = "Název projektu může mít maximálně 100 znaků")
@@ -30,8 +31,8 @@ public class Project {
     @Column(nullable = false)
     private int budget;
 
-    @Column(nullable = false)
-    private String createdAt;
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     @OneToMany(mappedBy = "project", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Task> tasks;
@@ -39,7 +40,7 @@ public class Project {
     public Project() {
     }
 
-    public Project(int id, String name, String description, User creator, int budget, String createdAt) {
+    public Project(Integer id, String name, String description, User creator, int budget, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -48,11 +49,11 @@ public class Project {
         this.createdAt = createdAt;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
@@ -80,7 +81,7 @@ public class Project {
         this.creator = creator;
     }
 
-    public float getBudget() {
+    public int getBudget() {
         return budget;
     }
 
@@ -88,11 +89,15 @@ public class Project {
         this.budget = budget;
     }
 
-    public String getCreatedAt() {
+    public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public List<Task> getTasks() {
+        return tasks;
+    }
+
+    public void setTasks(List<Task> tasks) {
+        this.tasks = tasks;
     }
 }

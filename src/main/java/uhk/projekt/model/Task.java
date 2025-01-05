@@ -3,6 +3,7 @@ package uhk.projekt.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -11,12 +12,12 @@ public class Task {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Název úkolu je povinný")
     @Size(max = 100, message = "Název úkolu může mít maximálně 100 znaků")
     @Column(nullable = false, length = 100)
-    private String title;
+    private String name; // Změna z 'title' na 'name'
 
     @Size(max = 500, message = "Popis úkolu může mít maximálně 500 znaků")
     @Column(length = 500)
@@ -40,18 +41,20 @@ public class Task {
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Message> messages;
 
-    @ManyToOne
-    @JoinColumn(name = "project_id")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id", nullable = false)
     private Project project;
 
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
 
     public Task() {
 
     }
 
-    public Task(int id, String title, String description, User creator, User solver, int priority, Project project) {
+    public Task(Integer id, String name, String description, User creator, User solver, int priority, Project project) {
         this.id = id;
-        this.title = title;
+        this.name = name;
         this.description = description;
         this.creator = creator;
         this.solver = solver;
@@ -59,20 +62,21 @@ public class Task {
         this.project = project;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public String getTitle() {
-        return title;
+    // Getter a Setter pro 'name'
+    public String getName() {
+        return name;
     }
 
-    public void set$title(String title) {
-        this.title = title;
+    public void setName(String name) { // Opravený setter
+        this.name = name;
     }
 
     public String getDescription() {
@@ -113,5 +117,25 @@ public class Task {
 
     public void setProject(Project project) {
         this.project = project;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public List<Message> getMessages() {
+        return messages;
+    }
+
+    public void setMessages(List<Message> messages) {
+        this.messages = messages;
+    }
+
+    public List<TimeLog> getTimeLogs() {
+        return timeLogs;
+    }
+
+    public void setTimeLogs(List<TimeLog> timeLogs) {
+        this.timeLogs = timeLogs;
     }
 }

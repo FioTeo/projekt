@@ -46,11 +46,15 @@ public class MessageServiceImp implements MessageService {
 
     @Override
     @Transactional
-    public Message saveMessage(Message message) {
+    public void saveMessage(Message message) {
         if (message.getTask() != null && message.getTask().getId() == 0) {
             throw new IllegalArgumentException("Task must have a valid ID");
         }
         messageRepository.save(message);
-        return message;
+    }
+
+    @Override
+    public List<Message> getMessagesByTaskId(Integer taskId) {
+        return messageRepository.findByTaskId(taskId);
     }
 }

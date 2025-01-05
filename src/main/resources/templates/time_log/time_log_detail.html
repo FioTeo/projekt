@@ -1,23 +1,44 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Detail časového záznamu</title>
+    <title>Detail TimeLogu</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1>Detail časového záznamu</h1>
-<div>
-    <b>ID:</b> <span th:text="${timeLog.id}">1</span>
+<div class="container mt-4">
+    <h1>Detail TimeLogu</h1>
+
+    <table class="table table-bordered">
+        <tr>
+            <th>ID</th>
+            <td th:text="${timeLog.id}">1</td>
+        </tr>
+        <tr>
+            <th>Úkol</th>
+            <td th:text="${timeLog.task.name}">Úkol</td>
+        </tr>
+        <tr>
+            <th>Uživatel</th>
+            <td th:text="${timeLog.user.username}">Uživatel</td>
+        </tr>
+        <tr>
+            <th>Popis</th>
+            <td th:text="${timeLog.description}">Popis</td>
+        </tr>
+        <tr>
+            <th>Čas (hodiny)</th>
+            <td th:text="${timeLog.time}">2.5</td>
+        </tr>
+        <tr>
+            <th>Vytvořeno</th>
+            <td th:text="${#temporals.format(timeLog.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-05 13:06</td>
+        </tr>
+    </table>
+
+    <a th:href="@{/time_logs}" class="btn btn-secondary">Zpět na seznam</a>
+    <a th:href="@{'/time_logs/edit/' + ${timeLog.id}}" class="btn btn-primary">Edit</a>
+    <a th:href="@{'/time_logs/delete/' + ${timeLog.id}}" class="btn btn-danger" onclick="return confirm('Opravdu chcete smazat tento TimeLog?');">Smazat</a>
 </div>
-<div>
-    <b>Uživatel:</b> <span th:text="${timeLog.user}">Uživatel</span>
-</div>
-<div>
-    <b>Úkol:</b> <span th:text="${timeLog.task}">Úkol</span>
-</div>
-<div>
-    <b>Hodiny:</b> <span th:text="${timeLog.hours}">Hodiny</span>
-</div>
-<a th:href="@{/timelogs}">Zpět na seznam záznamů</a>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

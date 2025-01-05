@@ -1,43 +1,54 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title th:if="${user.id != null}">Editace uživatele</title>
-    <title th:if="${user.id == null}">Vytvoření uživatele</title>
+    <title th:text="${user.id != null} ? 'Editace uživatele' : 'Vytvoření uživatele'">Formulář uživatele</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1 th:if="${user.id != null}">Editace uživatele</h1>
-<h1 th:if="${user.id == null}">Vytvoření uživatele</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <!-- Nadpis -->
+            <h1 class="mb-4 text-center" th:text="${user.id != null} ? 'Editace uživatele' : 'Vytvoření uživatele'">Formulář uživatele</h1>
 
-<!-- Error Message -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}">Došlo k chybě.</p>
+            <!-- Error Message -->
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+                <p th:text="${errorMessage}">Došlo k chybě.</p>
+            </div>
+
+            <!-- Formulář -->
+            <form th:action="${user.id != null} ? @{'/users/edit/' + ${user.id}} : @{/users/create}" th:object="${user}" method="post">
+                <div class="mb-3">
+                    <label for="name" class="form-label">Jméno:</label>
+                    <input type="text" id="name" th:field="*{name}" class="form-control" required maxlength="50" placeholder="Zadejte jméno">
+                </div>
+                <div class="mb-3">
+                    <label for="surname" class="form-label">Příjmení:</label>
+                    <input type="text" id="surname" th:field="*{surname}" class="form-control" required maxlength="50" placeholder="Zadejte příjmení">
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email:</label>
+                    <input type="email" id="email" th:field="*{email}" class="form-control" required maxlength="100" placeholder="Zadejte email">
+                </div>
+                <div class="mb-4">
+                    <label for="password" class="form-label">Heslo:</label>
+                    <input type="password" id="password" th:field="*{password}" class="form-control"
+                           th:placeholder="${user.id != null} ? 'Zadejte nové heslo nebo ponechte prázdné' : 'Zadejte heslo'">
+                </div>
+
+                <!-- Tlačítka -->
+                <div class="d-flex justify-content-between">
+                    <a th:href="@{/users}" class="btn btn-secondary">Zpět na seznam uživatelů</a>
+                    <button type="submit" class="btn btn-primary" th:text="${user.id != null} ? 'Uložit změny' : 'Vytvořit'">Odeslat</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
-<form th:action="${user.id != null} ? @{'/users/edit/' + ${user.id}} : @{/users/create}" th:object="${user}" method="post">
-    <div>
-        <label for="name">Jméno:</label>
-        <input type="text" id="name" th:field="*{name}" required maxlength="50"/>
-    </div>
-    <div>
-        <label for="surname">Příjmení:</label>
-        <input type="text" id="surname" th:field="*{surname}" required maxlength="50"/>
-    </div>
-    <div>
-        <label for="email">Email:</label>
-        <input type="email" id="email" th:field="*{email}" required maxlength="100"/>
-    </div>
-    <div>
-        <label for="password">Heslo:</label>
-        <input type="password" id="password" th:field="*{password}"
-               th:placeholder="${user.id != null} ? 'Zadejte nové heslo nebo ponechte prázdné' : ''"/>
-    </div>
-
-    <!-- Separate Button Logic -->
-    <button type="submit" th:if="${user.id != null}">Uložit změny</button>
-    <button type="submit" th:if="${user.id == null}">Vytvořit</button>
-</form>
-
-<a th:href="@{/users}">Zpět na seznam uživatelů</a>
+<!-- Bootstrap JS a závislosti -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

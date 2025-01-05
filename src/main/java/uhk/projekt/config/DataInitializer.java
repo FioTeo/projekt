@@ -10,8 +10,6 @@ import uhk.projekt.model.User;
 import uhk.projekt.repository.RoleRepository;
 import uhk.projekt.repository.UserRepository;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Configuration
@@ -49,7 +47,6 @@ public class DataInitializer {
                 userRepository.save(admin);
             }
 
-            // Create Regular User
             String userEmail = "user@comapny.com";
             if (!userRepository.existsByEmail(userEmail)) {
                 User user = new User();
@@ -58,7 +55,6 @@ public class DataInitializer {
                 user.setEmail(userEmail);
                 user.setPassword(passwordEncoder.encode("userpass"));
 
-                // Assign USER role
                 Optional<Role> userRole = roleRepository.findByName("USER");
                 userRole.ifPresent(role -> {
                     user.getRoles().add(role);
@@ -66,8 +62,6 @@ public class DataInitializer {
 
                 userRepository.save(user);
             }
-
-            // You can add more users here as needed
         };
     }
 }

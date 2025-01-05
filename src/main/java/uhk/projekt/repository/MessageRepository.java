@@ -10,8 +10,9 @@ import java.util.List;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, Integer> {
-    List<Message> findByTask(Project project);
     List<Message> findByTask(Task task);
     List<Message> findByTask_Project_Id(Integer projectId);
+    List<Message> findByTaskId(Integer taskId);
+
 }
 

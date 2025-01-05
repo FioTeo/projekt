@@ -47,13 +47,18 @@ public class TimeLogServiceImp implements TimeLogService {
 
     @Override
     @Transactional
-    public TimeLog saveTimeLog(TimeLog timeLog) {
-        return timeLogRepository.save(timeLog);
+    public void saveTimeLog(TimeLog timeLog) {
+        timeLogRepository.save(timeLog);
     }
 
     @Override
     @Transactional
     public void deleteTimeLogById(Integer id) {
         timeLogRepository.deleteById(id);
+    }
+
+    @Override
+    public List<TimeLog> getTimeLogsByTaskId(Integer taskId) {
+        return timeLogRepository.findByTaskId(taskId);
     }
 }

@@ -1,37 +1,55 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Uživatelé</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Uživatelé</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Uživatelé</h1>
 
-<!-- Success and Error Messages -->
-<div th:if="${param.success}" style="color: green;">
-    <p th:text="${param.success}">Akce byla úspěšná.</p>
-</div>
-<div th:if="${param.error}" style="color: red;">
-    <p th:text="${param.error}">Došlo k chybě.</p>
+    <!-- Success and Error Messages -->
+    <div th:if="${param.success}" class="alert alert-success" role="alert">
+        <p th:text="${param.success}">Akce byla úspěšná.</p>
+    </div>
+    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        <p th:text="${param.error}">Došlo k chybě.</p>
+    </div>
+
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>Jméno</th>
+                <th>Email</th>
+                <th>Vytvořen</th>
+                <th>Akce</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="user : ${users}">
+                <td>
+                    <a th:href="@{'/users/detail/' + ${user.id}}" class="text-decoration-none">
+                        <span th:text="${user.name} + ' ' + ${user.surname}">Jméno a příjmení</span>
+                    </a>
+                </td>
+                <td th:text="${user.email}">Email uživatele</td>
+                <td th:text="${#dates.format(user.createdAt, 'dd.MM.yyyy HH:mm')}">Datum vytvoření</td>
+                <td>
+                    <a th:href="@{'/users/edit/' + ${user.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
+                    <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <a th:href="@{/users/create}" class="btn btn-success">Vytvořit nového uživatele</a>
 </div>
 
-<ul>
-    <li th:each="user : ${users}">
-        <a th:href="@{'/users/detail/' + ${user.id}}">
-            <span th:text="${user.name} + ' ' + ${user.surname}">Jméno a příjmení</span>
-        </a>
-        <div>
-            <b>Email:</b> <span th:text="${user.email}">Email uživatele</span>
-        </div>
-        <div>
-            <b>Vytvořen:</b> <span th:text="${user.createdAt}">Datum vytvoření</span>
-        </div>
-        <div>
-            <a th:href="@{'/users/edit/' + ${user.id}}">Editovat</a> |
-            <a th:href="@{'/users/delete/' + ${user.id}}" onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>
-        </div>
-    </li>
-</ul>
-<a th:href="@{/users/create}">Vytvořit nového uživatele</a>
+<!-- Bootstrap JS a závislosti -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

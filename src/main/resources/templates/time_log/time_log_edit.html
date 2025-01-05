@@ -1,35 +1,34 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title th:if="${timeLog.id != null}">Editace uživatele</title>
-    <title th:if="${timeLog.id == null}">Vytvoření uživatele</title>
+    <title>Formulář TimeLogu</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1 th:if="${timeLog.id != null}">Editace uživatele</h1>
-<h1 th:if="${timeLog.id == null}">Vytvoření uživatele</h1>
+<div class="container mt-4">
+    <h1 th:text="${timeLog.id != null} ? 'Editovat TimeLog' : 'Vytvořit TimeLog'">Formulář TimeLogu</h1>
 
-<!-- Error Message -->
-<div th:if="${errorMessage}" style="color: red;">
-    <p th:text="${errorMessage}">Došlo k chybě.</p>
+    <!-- Zobrazení Chybové Zprávy -->
+    <div th:if="${errorMessage}">
+        <div class="alert alert-danger" th:text="${errorMessage}">Chyba</div>
+    </div>
+
+    <!-- Formulář -->
+    <form th:action="@{${timeLog.id != null} ? '/time_logs/edit/' + ${timeLog.id} + '?taskId=' + ${taskId} : '/time_logs/create?taskId=' + ${taskId}}" th:object="${timeLog}" method="post">
+        <div class="form-group">
+            <label for="description">Popis</label>
+            <input type="text" id="description" th:field="*{description}" class="form-control" placeholder="Popis" />
+            <div th:if="${#fields.hasErrors('description')}" class="text-danger" th:errors="*{description}">Popis chyba</div>
+        </div>
+        <div class="form-group">
+            <label for="time">Čas (hodiny)</label>
+            <input type="number" step="0.1" id="time" th:field="*{time}" class="form-control" placeholder="Čas" />
+            <div th:if="${#fields.hasErrors('time')}" class="text-danger" th:errors="*{time}">Čas chyba</div>
+        </div>
+        <button type="submit" class="btn btn-primary mt-2" th:text="${timeLog.id != null} ? 'Uložit Změny' : 'Vytvořit'}">Uložit</button>
+        <a th:href="@{/time_logs}" class="btn btn-secondary mt-2">Zrušit</a>
+    </form>
 </div>
-
-<form th:action="${timeLog.id != null} ? @{'/timelogs/edit/' + ${timeLog.id}} : @{/timelogs/create}" th:object="${timeLog}" method="post">
-    <div>
-        <label for="user">Uživatel:</label>
-        <input type="text" id="user" th:field="*{user}" required/>
-    </div>
-    <div>
-        <label for="task">Úkol:</label>
-        <input type="text" id="task" th:field="*{task}" required/>
-    </div>
-    <div>
-        <label for="hours">Hodiny:</label>
-        <input type="number" id="hours" th:field="*{hours}" required/>
-    </div>
-    <button type="submit" th:if="${timeLog.id != null}">Uložit změny</button>
-    <button type="submit" th:if="${timeLog.id == null}">Vytvořit</button>
-</form>
-<a th:href="@{/timelogs}">Zpět na seznam záznamů</a>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

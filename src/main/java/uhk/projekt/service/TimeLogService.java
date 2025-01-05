@@ -11,6 +11,7 @@ public interface TimeLogService {
     List<TimeLog> getAllTimeLogsByTask(Integer taskId);
     List<TimeLog> getAllTimeLogsByProject(Integer projectId);
     Optional<TimeLog> getTimeLogById(Integer id);
-    TimeLog saveTimeLog(TimeLog timeLog);
+    void saveTimeLog(TimeLog timeLog);
     void deleteTimeLogById(Integer id);
+    List<TimeLog> getTimeLogsByTaskId(Integer taskId);
 }

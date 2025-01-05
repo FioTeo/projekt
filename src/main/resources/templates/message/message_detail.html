@@ -1,20 +1,49 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Detail zprávy</title>
+    <title>Detail Zprávy</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1>Detail zprávy</h1>
-<div>
-    <b>ID:</b> <span th:text="${message.id}">1</span>
+<div class="container mt-5">
+    <!-- Nadpis -->
+    <h1 class="mb-4 text-center">Detail Zprávy</h1>
+
+    <!-- Tabulka s detaily -->
+    <table class="table table-bordered table-striped">
+        <tr>
+            <th>ID</th>
+            <td th:text="${message.id}">1</td>
+        </tr>
+        <tr>
+            <th>Úkol</th>
+            <td th:text="${message.task.name}">Úkol</td>
+        </tr>
+        <tr>
+            <th>Uživatel</th>
+            <td th:text="${message.user.username}">Uživatel</td>
+        </tr>
+        <tr>
+            <th>Zpráva</th>
+            <td th:text="${message.message}">Zpráva</td>
+        </tr>
+        <tr>
+            <th>Vytvořeno</th>
+            <td th:text="${#temporals.format(message.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-05 13:06</td>
+        </tr>
+    </table>
+
+    <!-- Akční tlačítka -->
+    <div class="d-flex justify-content-between mt-4">
+        <a th:href="@{/messages}" class="btn btn-secondary">Zpět na seznam</a>
+        <div>
+            <a th:href="@{'/messages/edit/' + ${message.id}}" class="btn btn-primary me-2">Edit</a>
+            <a th:href="@{'/messages/delete/' + ${message.id}}" class="btn btn-danger" onclick="return confirm('Opravdu chcete smazat tuto zprávu?');">Smazat</a>
+        </div>
+    </div>
 </div>
-<div>
-    <b>Název:</b> <span th:text="${message.title}">Název zprávy</span>
-</div>
-<div>
-    <b>Obsah:</b> <span th:text="${message.content}">Obsah zprávy</span>
-</div>
-<a th:href="@{/messages}">Zpět na seznam zpráv</a>
+
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

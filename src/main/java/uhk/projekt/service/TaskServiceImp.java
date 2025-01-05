@@ -27,6 +27,11 @@ public class TaskServiceImp implements TaskService {
         return taskRepository.findByProjectId(projectId);
     }
 
+    /**
+     * Získá úkol podle ID spolu s jeho projektem.
+     */
+    public Optional<Task> getTaskByIdWithProject(Integer id) {return taskRepository.findById(id);}
+
     @Override
     @Transactional(readOnly = true)
     public List<Task> getAllTasksByUser(Integer userId) {
@@ -41,8 +46,8 @@ public class TaskServiceImp implements TaskService {
 
     @Override
     @Transactional
-    public Task saveTask(Task task) {
-        return taskRepository.save(task);
+    public void saveTask(Task task) {
+        taskRepository.save(task);
     }
 
     @Override

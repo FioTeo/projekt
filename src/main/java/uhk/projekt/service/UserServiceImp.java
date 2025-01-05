@@ -53,4 +53,16 @@ public class UserServiceImp implements UserService {
     public void deleteUserById(Integer id) {
         userRepository.deleteById(id);
     }
+
+    /**
+     * Find a user by their email.
+     *
+     * @param email The user's email.
+     * @return The User entity.
+     * @throws RuntimeException if the user is not found.
+     */
+    public User findByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
 }

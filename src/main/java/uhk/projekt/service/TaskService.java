@@ -10,6 +10,7 @@ public interface TaskService {
     List<Task> getAllTasksByProject(Integer projectId);
     List<Task> getAllTasksByUser(Integer userId); // Může být pro řešitele nebo tvůrce
     Optional<Task> getTaskById(Integer id);
-    Task saveTask(Task task);
+    void saveTask(Task task);
     void deleteTaskById(Integer id);
+    Optional<Task> getTaskByIdWithProject(Integer id);
 }

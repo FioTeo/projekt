@@ -1,44 +1,54 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Seznam časových záznamů</title>
+    <title>Time Logs</title>
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
 </head>
 <body>
-<h1>Seznam časových záznamů</h1>
+<div class="container mt-4">
+    <h1>Time Logs</h1>
 
-<!-- Success and Error Messages -->
-<div th:if="${param.success}" style="color: green;">
-    <p th:text="${param.success}">Akce byla úspěšná.</p>
-</div>
-<div th:if="${param.error}" style="color: red;">
-    <p th:text="${param.error}">Došlo k chybě.</p>
-</div>
+    <!-- Zobrazení Chybových nebo Úspěšných Zpráv -->
+    <div th:if="${param.error}">
+        <div class="alert alert-danger" th:text="${param.error}">Chyba</div>
+    </div>
+    <div th:if="${param.success}">
+        <div class="alert alert-success" th:text="${param.success}">Úspěch</div>
+    </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Uživatel</th>
-        <th>Úkol</th>
-        <th>Hodiny</th>
-        <th>Akce</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="timeLog : ${timeLogs}">
-        <td th:text="${timeLog.id}">1</td>
-        <td th:text="${timeLog.user}">Uživatel</td>
-        <td th:text="${timeLog.task}">Úkol</td>
-        <td th:text="${timeLog.hours}">Hodiny</td>
-        <td>
-            <a th:href="@{'/timelogs/detail/' + ${timeLog.id}}">Detail</a> |
-            <a th:href="@{'/timelogs/edit/' + ${timeLog.id}}">Editovat</a> |
-            <a th:href="@{'/timelogs/delete/' + ${timeLog.id}}" onclick="return confirm('Opravdu chcete smazat tento záznam?');">Smazat</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<a th:href="@{/timelogs/create}">Vytvořit nový záznam</a>
+    <!-- Seznam TimeLogů -->
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Úkol</th>
+            <th>Uživatel</th>
+            <th>Popis</th>
+            <th>Čas (hodiny)</th>
+            <th>Vytvořeno</th>
+            <th>Akce</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timeLog : ${timeLogs}">
+            <td th:text="${timeLog.id}">1</td>
+            <td th:text="${timeLog.task.name}">Úkol</td>
+            <td th:text="${timeLog.user.username}">Uživatel</td>
+            <td th:text="${timeLog.description}">Popis</td>
+            <td th:text="${timeLog.time}">2.5</td>
+            <td th:text="${#temporals.format(timeLog.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-05 13:06</td>
+            <td>
+                <a th:href="@{'/time_logs/detail/' + ${timeLog.id}}" class="btn btn-info btn-sm">Detail</a>
+                <a th:href="@{'/time_logs/edit/' + ${timeLog.id} + '?taskId=' + ${timeLog.task.id}}" class="btn btn-primary btn-sm">Edit</a>
+                <a th:href="@{'/time_logs/delete/' + ${timeLog.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Opravdu chcete smazat tento TimeLog?');">Smazat</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- Odkaz na Vytvoření nového TimeLogu -->
+    <a th:href="@{/time_logs/create(taskId=${taskId})}" class="btn btn-success">Přidat TimeLog</a>
+</div>
+<script th:src="@{/js/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

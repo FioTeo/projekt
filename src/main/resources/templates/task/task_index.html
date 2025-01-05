@@ -1,42 +1,57 @@
 <!DOCTYPE html>
-<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Seznam úkolů</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-<h1>Seznam úkolů</h1>
+<div class="container mt-5">
+    <h1 class="mb-4">Seznam úkolů</h1>
 
-<!-- Success and Error Messages -->
-<div th:if="${param.success}" style="color: green;">
-    <p th:text="${param.success}">Akce byla úspěšná.</p>
-</div>
-<div th:if="${param.error}" style="color: red;">
-    <p th:text="${param.error}">Došlo k chybě.</p>
+    <!-- Success and Error Messages -->
+    <div th:if="${param.success}" class="alert alert-success" role="alert">
+        <p th:text="${param.success}">Akce byla úspěšná.</p>
+    </div>
+    <div th:if="${param.error}" class="alert alert-danger" role="alert">
+        <p th:text="${param.error}">Došlo k chybě.</p>
+    </div>
+
+    <!-- Tabulka úkolů -->
+    <div class="table-responsive">
+        <table class="table table-striped table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>ID</th>
+                <th>Název</th>
+                <th>Popis</th>
+                <th>Akce</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="task : ${tasks}">
+                <td th:text="${task.id}">1</td>
+                <td th:text="${task.name}">Název</td>
+                <td th:text="${task.description}">Popis</td>
+                <td>
+                    <a th:href="@{'/tasks/detail/' + ${task.id}}" class="btn btn-info btn-sm me-2">Detail</a>
+                    <a th:href="@{'/tasks/edit/' + ${task.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
+                    <a th:href="@{'/tasks/delete/' + ${task.id}}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Opravdu chcete smazat tento úkol?');">Smazat</a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Tlačítko vytvoření nového úkolu -->
+    <div class="mt-4">
+        <a th:href="@{/tasks/create}" class="btn btn-success">Vytvořit nový úkol</a>
+    </div>
 </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Název</th>
-        <th>Popis</th>
-        <th>Akce</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="task : ${tasks}">
-        <td th:text="${task.id}">1</td>
-        <td th:text="${task.name}">Název</td>
-        <td th:text="${task.description}">Popis</td>
-        <td>
-            <a th:href="@{'/tasks/detail/' + ${task.id}}">Detail</a> |
-            <a th:href="@{'/tasks/edit/' + ${task.id}}">Editovat</a> |
-            <a th:href="@{'/tasks/delete/' + ${task.id}}" onclick="return confirm('Opravdu chcete smazat tento úkol?');">Smazat</a>
-        </td>
-    </tr>
-    </tbody>
-</table>
-<a th:href="@{/tasks/create}">Vytvořit nový úkol</a>
+<!-- Bootstrap JS a závislosti -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

@@ -11,12 +11,12 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Entity
-@Table(name = "users") // Ensure table name matches
+@Table(name = "users")
 public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Integer id;
 
     @NotBlank(message = "Jméno je povinné")
     @Size(max = 50, message = "Jméno může mít maximálně 50 znaků")
@@ -49,10 +49,12 @@ public class User implements UserDetails {
     )
     private Set<Role> roles = new HashSet<>();
 
-    // Constructors
+    @OneToMany(mappedBy = "creator", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Project> projects;
+
     public User() {}
 
-    public User(int id, String name, String surname, String email, String password) {
+    public User(Integer id, String name, String surname, String email, String password) {
         this.id = id;
         this.name = name;
         this.surname = surname;
@@ -60,13 +62,9 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    // Getters and Setters
-
-    public int getId() {
+    public Integer getId() {
         return id;
     }
-
-    // No setter for id, as it's auto-generated
 
     public String getName() {
         return name;
@@ -118,12 +116,18 @@ public class User implements UserDetails {
         this.roles = roles;
     }
 
-    // Implementation of UserDetails methods
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles.stream()
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role.getName()))
                 .collect(Collectors.toSet());
+    }
+
+    public List<Project> getProjects() {
+        return projects;
+    }
+
+    public void setProjects(List<Project> projects) {
+        this.projects = projects;
     }
 }
