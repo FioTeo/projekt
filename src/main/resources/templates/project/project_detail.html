@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Detail projektu</title>
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/styles/bootstrap.min.css}" />
 </head>
 <body>
 <div class="container mt-5">
@@ -42,8 +42,8 @@
             <td th:text="${task.description}">Popis úkolu</td>
             <td>
                 <a th:href="@{'/projects/detail/' + ${project.id} + '/task/' + ${task.id}}" class="btn btn-info btn-sm me-1">Detail</a>
-                <a th:href="@{'/projects/detail/' + ${project.id} + '/task/' + ${task.id} + '/edit'}" class="btn btn-primary btn-sm me-1">Edit</a>
-                <a th:href="@{'/projects/detail/' + ${project.id} + '/task/' + ${task.id} + '/delete'}" class="btn btn-danger btn-sm"
+                <a th:href="@{'/projects/detail/' + ${project.id} + '/task/edit/' + ${task.id}}" class="btn btn-primary btn-sm me-1">Edit</a>
+                <a th:href="@{'/projects/detail/' + ${project.id} + '/task/delete/' + ${task.id}}" class="btn btn-danger btn-sm"
                    onclick="return confirm('Opravdu chcete smazat tento úkol?');">Delete</a>
             </td>
         </tr>
@@ -70,6 +70,13 @@
             <label for="description" class="form-label">Popis úkolu</label>
             <textarea id="description" th:field="*{description}" class="form-control" required></textarea>
             <div th:if="${#fields.hasErrors('description')}" class="text-danger" th:errors="*{description}">Popis úkolu chyba</div>
+        </div>
+        <div class="mb-3">
+            <label for="solver" class="form-label">Řešitel:</label>
+            <select id="solver" th:field="*{solver.id}" class="form-select">
+                <option value="">Vyberte řešitele</option>
+                <option th:each="user : ${users}" th:value="${user.id}" th:text="${user.username}"></option>
+            </select>
         </div>
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Vytvořit</button>

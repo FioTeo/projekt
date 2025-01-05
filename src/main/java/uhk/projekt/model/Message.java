@@ -20,7 +20,7 @@ public class Message {
     @NotBlank(message = "Zpráva je povinná")
     @Size(max = 1000, message = "Zpráva může mít maximálně 1000 znaků")
     @Column(nullable = false, length = 1000)
-    private String message;
+    private String body;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -33,10 +33,10 @@ public class Message {
 
     }
 
-    public Message(Integer id, Task task, String message, User user, LocalDateTime createdAt) {
+    public Message(Integer id, Task task, String body, User user, LocalDateTime createdAt) {
         this.id = id;
         this.task = task;
-        this.message = message;
+        this.body = body;
         this.user = user;
         this.createdAt = createdAt;
     }
@@ -57,12 +57,12 @@ public class Message {
         this.task = task;
     }
 
-    public String getMessage() {
-        return message;
+    public String getBody() {
+        return body;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
+    public void setBody(String body) {
+        this.body = body;
     }
 
     public User getUser() {

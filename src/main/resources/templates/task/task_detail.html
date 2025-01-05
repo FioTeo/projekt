@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Detail úkolu</title>
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}" />
+    <link rel="stylesheet" th:href="@{/assets/styles/bootstrap.min.css}" />
 </head>
 <body>
 <div class="container mt-5">
@@ -24,7 +24,7 @@
     </div>
 
     <!-- Seznam TimeLogů -->
-    <h2 class="mt-4">Time Logs</h2>
+    <h2 class="mt-4">Časové záznamy</h2>
     <table class="table table-striped table-bordered">
         <thead class="table-dark">
         <tr>
@@ -70,7 +70,7 @@
     <div th:each="msg : ${messages}" class="card mb-3">
         <div class="card-body">
             <h5 class="card-title" th:text="${msg.user.username}">Uživatel</h5>
-            <p class="card-text" th:text="${msg.message}">Zpráva</p>
+            <p class="card-text" th:text="${msg.body}">Zpráva</p>
             <p class="card-text">
                 <small class="text-muted" th:text="${#temporals.format(msg.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-05 13:06</small>
             </p>
@@ -82,11 +82,11 @@
     <form th:action="@{'/projects/detail/' + ${project.id} + '/task/' + ${task.id} + '/messages/create'}"
           th:object="${message}" method="post" class="form-group">
         <div class="mb-3">
-            <label for="message" class="form-label">Zpráva</label>
-            <textarea id="message" th:field="*{message}" class="form-control" placeholder="Zpráva" required></textarea>
-            <div th:if="${#fields.hasErrors('message')}" class="text-danger" th:errors="*{message}">Zpráva chyba</div>
+            <label for="body" class="form-label">Zpráva</label>
+            <textarea id="body" th:field="*{body}" class="form-control" placeholder="Zpráva" required></textarea>
+            <div th:if="${#fields.hasErrors('body')}" class="text-danger" th:errors="*{message}">Zpráva chyba</div>
         </div>
-        <button type="submit" class="btn btn-primary">Přidat</button>
+        <button type="submit" class="mt-2 btn btn-primary">Přidat</button>
     </form>
 
     <!-- Tlačítko Zpět -->

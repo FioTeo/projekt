@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>Uživatelé</title>
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/assets/styles/bootstrap.min.css}" />
 </head>
 <body>
 <div class="container mt-5">
@@ -36,7 +36,7 @@
                     </a>
                 </td>
                 <td th:text="${user.email}">Email uživatele</td>
-                <td th:text="${#dates.format(user.createdAt, 'dd.MM.yyyy HH:mm')}">Datum vytvoření</td>
+                <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">Datum vytvoření</td>
                 <td>
                     <a th:href="@{'/users/edit/' + ${user.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
                     <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>

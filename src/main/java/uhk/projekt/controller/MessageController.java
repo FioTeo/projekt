@@ -174,7 +174,7 @@ public class MessageController {
         }
 
         try {
-            existingMessage.setMessage(message.getMessage());
+            existingMessage.setBody(message.getBody());
             messageService.saveMessage(existingMessage);
             return "redirect:/projects/detail/" + project.getId() + "/task/" + task.getId() + "?success=MessageUpdated";
         } catch (RuntimeException ex) {
