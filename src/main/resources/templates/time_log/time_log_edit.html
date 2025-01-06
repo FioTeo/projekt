@@ -6,6 +6,13 @@
 </head>
 <body>
 <div class="container mt-4">
+    <!-- Navigation Links -->
+    <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{'/projects'}" class="btn btn-primary btn-lg">Projekty</a>
+        <a th:href="@{'/tasks'}" class="btn btn-secondary btn-lg">Úkoly</a>
+        <a th:href="@{'/users'}" class="btn btn-success btn-lg">Uživatelé</a>
+    </div>
+
     <h1 th:text="${timeLog.id != null} ? 'Editovat TimeLog' : 'Vytvořit TimeLog'">Formulář TimeLogu</h1>
 
     <!-- Zobrazení Chybové Zprávy -->

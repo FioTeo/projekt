@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -231,6 +232,7 @@ public class ProjectController {
             Task task = new Task();
             task.setProject(project);
             model.addAttribute("task", task);
+            model.addAttribute("users", userService.getAllUsers()); // Přidáno pro řešitele
             return "task/task_edit"; // Použijeme stejnou šablonu pro tvorbu a editaci úkolu
         } else {
             logger.error("Project with ID {} not found for creating task", projectId);
@@ -238,43 +240,70 @@ public class ProjectController {
         }
     }
 
-    /**
-     * Zpracuje vytvoření nového úkolu v rámci projektu.
-     */
     @PostMapping("/detail/{projectId}/tasks/create")
     public String createTask(
             @PathVariable Integer projectId,
             @Valid @ModelAttribute("task") Task task,
             BindingResult result,
+            @RequestParam(required = false) Integer solverId, // Accept solverId separately
+            @RequestParam(required = false) String deadline, // Přijímá deadline z formuláře
             Model model,
             Principal principal) {
+
+        // Fetch the project
         Optional<Project> projectOpt = projectService.getProjectById(projectId);
         if (projectOpt.isEmpty()) {
             return "redirect:/projects?error=ProjectNotFound";
         }
         Project project = projectOpt.get();
 
+        // Fetch the current user
         String username = principal.getName();
         User currentUser = userService.findByEmail(username);
         if (!project.getCreator().equals(currentUser)) {
             return "redirect:/projects?error=AccessDenied";
         }
 
+        // Handle validation errors
         if (result.hasErrors()) {
             model.addAttribute("project", project);
+            model.addAttribute("users", userService.getAllUsers()); // Ensure users are available in the form
             return "task/task_edit";
         }
 
+        // Fetch all users for the form in case of errors
         List<User> allUsers = userService.getAllUsers();
 
         try {
-            if (task.getSolver() != null && task.getSolver().getId() == null) {
-                Optional<User> solver = userService.getUserById(task.getSolver().getId());
-                task.setSolver(solver.orElse(null));
+            // Parse and set deadline
+            if (deadline != null && !deadline.isEmpty()) {
+                LocalDate parsedDeadline = LocalDate.parse(deadline);
+                task.setDeadline(parsedDeadline);
+            } else {
+                task.setDeadline(null); // No deadline assigned
             }
 
+            // Assign solver if solverId is provided
+            if (solverId != null) {
+                Optional<User> solver = userService.getUserById(solverId);
+                if (solver.isPresent()) {
+                    task.setSolver(solver.get());
+                } else {
+                    // Solver not found, reject the value
+                    result.rejectValue("solver", "NotFound", "Selected solver does not exist");
+                    model.addAttribute("users", allUsers);
+                    model.addAttribute("project", project);
+                    return "task/task_edit";
+                }
+            } else {
+                task.setSolver(null); // No solver assigned
+            }
+
+            // Set creator and project
             task.setCreator(currentUser);
             task.setProject(project);
+
+            // Save the task
             taskService.saveTask(task);
             logger.info("Task {} created successfully in project {} by user {}", task.getId(), projectId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "?success=TaskCreated";
@@ -403,6 +432,8 @@ public class ProjectController {
             @PathVariable Integer taskId,
             @Valid @ModelAttribute("task") Task updatedTask,
             BindingResult result,
+            @RequestParam(required = false) Integer solverId, // Přijímá solverId z formuláře
+            @RequestParam(required = false) String deadline, // Přijímá deadline z formuláře
             Model model,
             Principal principal) {
 
@@ -431,6 +462,7 @@ public class ProjectController {
             return "redirect:/projects?error=AccessDenied";
         }
 
+        // Zpracování validace
         if (result.hasErrors()) {
             logger.warn("Validation errors while editing task {} in project {}: {}", taskId, projectId, result.getAllErrors());
             model.addAttribute("users", allUsers);
@@ -440,12 +472,40 @@ public class ProjectController {
         }
 
         try {
+            // Parse and set deadline
+            if (deadline != null && !deadline.isEmpty()) {
+                LocalDate parsedDeadline = LocalDate.parse(deadline);
+                existingTask.setDeadline(parsedDeadline);
+            } else {
+                existingTask.setDeadline(null); // No deadline assigned
+            }
+
+            // Aktualizace polí
             existingTask.setName(updatedTask.getName());
             existingTask.setDescription(updatedTask.getDescription());
-            taskService.saveTask(existingTask);
+            existingTask.setPriority(updatedTask.getPriority());
+            existingTask.setStatus(updatedTask.getStatus());
 
+            // Aktualizace řešitele
+            if (solverId != null) {
+                Optional<User> solverOpt = userService.getUserById(solverId);
+                if (solverOpt.isPresent()) {
+                    existingTask.setSolver(solverOpt.get());
+                } else {
+                    // Resolver not found, přidejte chybu
+                    result.rejectValue("solver", "NotFound", "Selected solver does not exist");
+                    model.addAttribute("users", allUsers);
+                    model.addAttribute("project", project);
+                    return "task/task_edit";
+                }
+            } else {
+                existingTask.setSolver(null); // Nenastaven řešitel
+            }
+
+            // Uložení úkolu
+            taskService.saveTask(existingTask);
             logger.info("Task ID {} updated successfully in project {} by user {}", taskId, projectId, currentUser.getEmail());
-            return "redirect:/projects/detail/" + projectId + "?success=TaskUpdated";
+            return "redirect:/projects/detail/" + projectId + "/task/" + taskId + "?success=TaskUpdated";
         } catch (RuntimeException ex) {
             logger.error("Error while editing task {} in project {}: {}", taskId, projectId, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
@@ -453,6 +513,52 @@ public class ProjectController {
             model.addAttribute("task", existingTask);
             model.addAttribute("project", project);
             return "task/task_edit";
+        }
+    }
+
+    @PostMapping("/detail/{projectId}/task/delete/{taskId}")
+    public String deleteTask(
+            @PathVariable Integer projectId,
+            @PathVariable Integer taskId,
+            Model model,
+            Principal principal) {
+
+        Optional<Project> projectOpt = projectService.getProjectById(projectId);
+        Optional<Task> taskOpt = taskService.getTaskById(taskId);
+
+        if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
+            logger.error("Project ID {} or Task ID {} not found for deletion", projectId, taskId);
+            return "redirect:/projects?error=ProjectOrTaskNotFound";
+        }
+
+        Project project = projectOpt.get();
+        Task task = taskOpt.get();
+
+        // Ověření, že úkol patří do projektu
+        if (!task.getProject().getId().equals(projectId)) {
+            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
+            return "redirect:/projects?error=InvalidTask";
+        }
+
+        // Získání autentizovaného uživatele
+        String username = principal.getName();
+        User currentUser = userService.findByEmail(username);
+
+        // Ověření, že aktuální uživatel je tvůrcem projektu
+        if (!project.getCreator().equals(currentUser)) {
+            logger.warn("User {} tried to delete task {} in project {} without permission", username, taskId, projectId);
+            return "redirect:/projects?error=AccessDenied";
+        }
+
+        try {
+            taskService.deleteTaskById(taskId);
+            logger.info("Task ID {} deleted successfully from Project ID {} by user {}", taskId, projectId, currentUser.getEmail());
+            return "redirect:/projects/detail/" + projectId + "?success=TaskDeleted";
+        } catch (RuntimeException ex) {
+            logger.error("Error while deleting task {} from project {}: {}", taskId, projectId, ex.getMessage());
+            model.addAttribute("errorMessage", ex.getMessage());
+            // Znovu načteme detail úkolu s chybovou zprávou
+            return projectDetail(projectId, model, principal);
         }
     }
 

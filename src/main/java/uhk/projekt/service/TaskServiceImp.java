@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uhk.projekt.model.Task;
+import uhk.projekt.model.User;
 import uhk.projekt.repository.TaskRepository;
 
 import java.util.List;
@@ -54,5 +55,15 @@ public class TaskServiceImp implements TaskService {
     @Transactional
     public void deleteTaskById(Integer id) {
         taskRepository.deleteById(id);
+    }
+
+    /**
+     * Získá všechny úkoly přiřazené konkrétnímu uživateli.
+     *
+     * @param user aktuální uživatel
+     * @return seznam přiřazených úkolů
+     */
+    public List<Task> getTasksAssignedTo(User user) {
+        return taskRepository.findBySolver(user);
     }
 }

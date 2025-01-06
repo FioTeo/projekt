@@ -2,10 +2,9 @@ package uhk.projekt.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-
 import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Entity
 @Table(name = "tasks")
@@ -18,7 +17,7 @@ public class Task {
     @NotBlank(message = "Název úkolu je povinný")
     @Size(max = 100, message = "Název úkolu může mít maximálně 100 znaků")
     @Column(nullable = false, length = 100)
-    private String name; // Změna z 'title' na 'name'
+    private String name;
 
     @Size(max = 500, message = "Popis úkolu může mít maximálně 500 znaků")
     @Column(length = 500)
@@ -36,6 +35,10 @@ public class Task {
     @Column(nullable = false)
     private int priority;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private TaskStatus status = TaskStatus.OPEN; // Výchozí hodnota
+
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TimeLog> timeLogs;
 
@@ -49,11 +52,14 @@ public class Task {
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Task() {
+    @FutureOrPresent(message = "Deadline musí být dnes nebo v budoucnosti")
+    @Column(nullable = true)
+    private LocalDate deadline; // Nové pole pro deadline
 
+    public Task() {
     }
 
-    public Task(Integer id, String name, String description, User creator, User solver, int priority, Project project) {
+    public Task(Integer id, String name, String description, User creator, User solver, int priority, Project project, LocalDate deadline) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -61,7 +67,10 @@ public class Task {
         this.solver = solver;
         this.priority = priority;
         this.project = project;
+        this.deadline = deadline;
     }
+
+    // Gettery a Settery
 
     public Integer getId() {
         return id;
@@ -112,6 +121,14 @@ public class Task {
         this.priority = priority;
     }
 
+    public TaskStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(TaskStatus status) {
+        this.status = status;
+    }
+
     public Project getProject() {
         return project;
     }
@@ -138,5 +155,13 @@ public class Task {
 
     public void setTimeLogs(List<TimeLog> timeLogs) {
         this.timeLogs = timeLogs;
+    }
+
+    public LocalDate getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(LocalDate deadline) {
+        this.deadline = deadline;
     }
 }

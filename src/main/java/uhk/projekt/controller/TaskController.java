@@ -5,11 +5,14 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Task;
+import uhk.projekt.model.User;
 import uhk.projekt.service.TaskService;
 
 import jakarta.validation.Valid;
 import org.springframework.validation.BindingResult;
+import uhk.projekt.service.UserService;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,89 +23,31 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
-    /**
-     * Display all tasks.
-     */
+    @Autowired
+    private UserService userService;
+
     @GetMapping
-    public String listTasks(Model model) {
-        List<Task> tasks = taskService.getAllTasks();
-        model.addAttribute("tasks", tasks);
-        return "task/task_index"; // Corresponds to tasks.html
-    }
-
-    /**
-     * Display details of a specific task.
-     */
-    @GetMapping("/detail/{id}")
-    public String taskDetail(@PathVariable Integer id, Model model) {
-        Optional<Task> task = taskService.getTaskByIdWithProject(id);
-        if (task.isPresent()) {
-            model.addAttribute("task", task.get());
-            return "task/task_detail"; // Corresponds to task_detail.html
-        } else {
-            return "redirect:/tasks?error=TaskNotFound";
-        }
-    }
-
-    /**
-     * Show the form to edit an existing task.
-     */
-    @GetMapping("/edit/{id}")
-    public String showEditForm(@PathVariable Integer id, Model model) {
-        Optional<Task> taskOpt = taskService.getTaskByIdWithProject(id);
-        if (taskOpt.isPresent()) {
-            Task task = taskOpt.get();
-            model.addAttribute("task", task);
-            return "task/task_edit"; // Reuse the same form for editing
-        } else {
-            return "redirect:/tasks?error=TaskNotFound";
-        }
-    }
-
-    /**
-     * Handle form submission for editing an existing task.
-     */
-    @PostMapping("/edit/{id}")
-    public String editTask(@PathVariable Integer id,
-                           @Valid @ModelAttribute("task") Task task,
-                           BindingResult result,
-                           Model model) {
-        if (result.hasErrors()) {
-            return "task/task_edit";
-        }
+    public String listTasks(@RequestParam(name = "mine", required = false) Boolean mine, Model model, Principal principal) {
         try {
-            // Načtěte existující úkol spolu s projektem
-            Optional<Task> existingTaskOpt = taskService.getTaskByIdWithProject(id);
-            if (existingTaskOpt.isPresent()) {
-                Task existingTask = existingTaskOpt.get();
-                // Aktualizujte pouze relevantní pole
-                existingTask.setName(task.getName());
-                existingTask.setDescription(task.getDescription());
-                existingTask.setPriority(task.getPriority());
-                // Pokud chcete umožnit změnu projektu, musíte přidat logiku zde
+            List<Task> tasks;
+            String currentUserEmail = principal.getName();
+            User currentUser = userService.findByEmail(currentUserEmail);
 
-                taskService.saveTask(existingTask);
-                return "redirect:/tasks?success=TaskUpdated";
+            if (mine != null && mine) {
+                tasks = taskService.getTasksAssignedTo(currentUser);
+                model.addAttribute("mine", true);
             } else {
-                model.addAttribute("errorMessage", "Úkol nebyl nalezen.");
-                return "redirect:/tasks?error=TaskNotFound";
+                tasks = taskService.getAllTasks();
+                model.addAttribute("mine", false);
             }
-        } catch (RuntimeException ex) {
-            model.addAttribute("errorMessage", ex.getMessage());
-            return "task/task_edit";
-        }
-    }
 
-    /**
-     * Delete a task.
-     */
-    @GetMapping("/delete/{id}")
-    public String deleteTask(@PathVariable Integer id) {
-        try {
-            taskService.deleteTaskById(id);
-            return "redirect:/tasks?success=TaskDeleted";
-        } catch (RuntimeException ex) {
-            return "redirect:/tasks?error=" + ex.getMessage();
+            model.addAttribute("tasks", tasks);
+            model.addAttribute("currentUser", currentUser);
+
+            return "task/task_index";
+        } catch (Exception e) {
+            model.addAttribute("errorMessage", "Došlo k chybě při načítání úkolů.");
+            return "error";
         }
     }
 }

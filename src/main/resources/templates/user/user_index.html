@@ -8,39 +8,64 @@
 </head>
 <body>
 <div class="container mt-5">
+    <!-- Navigation Links -->
+    <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{'/projects'}" class="btn btn-primary btn-lg">Projekty</a>
+        <a th:href="@{'/tasks'}" class="btn btn-secondary btn-lg">Úkoly</a>
+        <a th:href="@{'/users'}" class="btn btn-success btn-lg">Uživatelé</a>
+    </div>
+
     <h1 class="mb-4">Uživatelé</h1>
 
-    <!-- Success and Error Messages -->
-    <div th:if="${param.success}" class="alert alert-success" role="alert">
-        <p th:text="${param.success}">Akce byla úspěšná.</p>
-    </div>
-    <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        <p th:text="${param.error}">Došlo k chybě.</p>
+    <!-- Tlačítko pro Vytvoření Nového Uživatele -->
+    <div class="d-flex justify-content-end mb-3">
+        <a th:href="@{'/users/create'}" class="btn btn-success">Vytvořit Nového Uživatele</a>
     </div>
 
+    <!-- Alerty pro Zprávy o Chybách a Úspěchu -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}">Došlo k chybě.</p>
+    </div>
+    <div th:if="${param.success}" class="alert alert-success" role="alert">
+        <p th:text="${param.success}">Úspěch</p>
+    </div>
+
+    <!-- Tabulka Uživatelských Účetů -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-bordered">
             <thead class="table-dark">
             <tr>
+                <th>ID</th>
                 <th>Jméno</th>
+                <th>Příjmení</th>
                 <th>Email</th>
-                <th>Vytvořen</th>
+                <th>Role</th>
+                <th>Vytvořeno</th>
                 <th>Akce</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="user : ${users}">
+                <td th:text="${user.id}">1</td>
+                <td th:text="${user.name}">Jméno</td>
+                <td th:text="${user.surname}">Příjmení</td>
+                <td th:text="${user.email}">email@example.com</td>
                 <td>
-                    <a th:href="@{'/users/detail/' + ${user.id}}" class="text-decoration-none">
-                        <span th:text="${user.name} + ' ' + ${user.surname}">Jméno a příjmení</span>
-                    </a>
+                    <span th:each="role, iterStat : ${user.roles}">
+                        <span th:text="${role.name}">ROLE_USER</span>
+                        <span th:if="${!iterStat.last}">, </span>
+                    </span>
                 </td>
-                <td th:text="${user.email}">Email uživatele</td>
-                <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">Datum vytvoření</td>
+                <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 12:00</td>
                 <td>
+                    <a th:href="@{'/users/detail/' + ${user.id}}" class="btn btn-info btn-sm me-2">Detail</a>
                     <a th:href="@{'/users/edit/' + ${user.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
-                    <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm" onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>
+                    <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm"
+                       onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>
                 </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(users)}">
+                <td colspan="7" class="text-center">Žádní uživatelé k zobrazení.</td>
             </tr>
             </tbody>
         </table>

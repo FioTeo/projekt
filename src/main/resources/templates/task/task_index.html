@@ -2,56 +2,79 @@
 <html lang="cs" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Seznam úkolů</title>
+    <title>Moje Úkoly</title>
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/assets/styles/bootstrap.min.css}" />
 </head>
 <body>
 <div class="container mt-5">
-    <h1 class="mb-4">Seznam úkolů</h1>
+    <!-- Navigation Links -->
+    <div class="d-flex justify-content-center gap-3">
+        <a th:href="@{'/projects'}" class="btn btn-primary btn-lg">Projekty</a>
+        <a th:href="@{'/tasks'}" class="btn btn-secondary btn-lg">Úkoly</a>
+        <a th:href="@{'/users'}" class="btn btn-success btn-lg">Uživatelé</a>
+    </div>
 
-    <!-- Success and Error Messages -->
+    <!-- Nadpis -->
+    <h1 class="mb-4 text-center">Moje Úkoly</h1>
+
+    <!-- Ovládací Prvky pro Filtrování -->
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+            <a th:href="@{/tasks}" class="btn btn-outline-primary" th:classappend="${mine} ? 'active' : ''">Všechny Úkoly</a>
+            <a th:href="@{/tasks(mine=true)}" class="btn btn-outline-primary ms-2" th:classappend="${mine} ? 'active' : ''">Moje Úkoly</a>
+        </div>
+        <div>
+            <a th:href="@{'/projects'}" class="btn btn-secondary">Zpět na Projekty</a>
+        </div>
+    </div>
+
+    <!-- Alerty pro Zprávy o Chybách a Úspěchu -->
+    <div th:if="${errorMessage}" class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage}">Došlo k chybě.</p>
+    </div>
     <div th:if="${param.success}" class="alert alert-success" role="alert">
-        <p th:text="${param.success}">Akce byla úspěšná.</p>
-    </div>
-    <div th:if="${param.error}" class="alert alert-danger" role="alert">
-        <p th:text="${param.error}">Došlo k chybě.</p>
+        <p th:text="${param.success}">Úspěch</p>
     </div>
 
-    <!-- Tabulka úkolů -->
+    <!-- Tabulka Úkolů -->
     <div class="table-responsive">
-        <table class="table table-striped table-hover">
+        <table class="table table-striped table-bordered">
             <thead class="table-dark">
             <tr>
                 <th>ID</th>
-                <th>Název</th>
-                <th>Popis</th>
+                <th>Název Úkolu</th>
+                <th>Projekt</th>
+                <th>Status</th>
+                <th>Priorita</th>
+                <th>Deadline</th>
+                <th>Vytvořeno</th>
                 <th>Akce</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="task : ${tasks}">
                 <td th:text="${task.id}">1</td>
-                <td th:text="${task.name}">Název</td>
-                <td th:text="${task.description}">Popis</td>
+                <td th:text="${task.name}">Název Úkolu</td>
+                <td th:text="${task.project.name}">Název Projektu</td>
+                <td th:text="${task.status.displayName()}">Status</td>
+                <td th:text="${task.priority}">1</td>
+                <td th:text="${task.deadline != null ? #temporals.format(task.deadline, 'yyyy-MM-dd') : 'Nenastaveno'}">2025-12-31</td>
+                <td th:text="${#temporals.format(task.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-05 13:06</td>
                 <td>
-                    <a th:href="@{'/tasks/detail/' + ${task.id}}" class="btn btn-info btn-sm me-2">Detail</a>
-                    <a th:href="@{'/tasks/edit/' + ${task.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
-                    <a th:href="@{'/tasks/delete/' + ${task.id}}" class="btn btn-danger btn-sm"
-                       onclick="return confirm('Opravdu chcete smazat tento úkol?');">Smazat</a>
+                    <!-- Odkaz na detail úkolu -->
+                    <a th:href="@{'/projects/detail/' + ${task.project.id} + '/task/' + ${task.id}}" class="btn btn-info btn-sm me-2">Detail</a>
                 </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(tasks)}">
+                <td colspan="9" class="text-center">Žádné úkoly k zobrazení.</td>
             </tr>
             </tbody>
         </table>
     </div>
-
-    <!-- Tlačítko vytvoření nového úkolu -->
-    <div class="mt-4">
-        <a th:href="@{/tasks/create}" class="btn btn-success">Vytvořit nový úkol</a>
-    </div>
 </div>
 
 <!-- Bootstrap JS a závislosti -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script th:src="@{/assets/scripts/bootstrap.bundle.min.js}"></script>
 </body>
 </html>

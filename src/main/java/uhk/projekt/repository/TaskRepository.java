@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import uhk.projekt.model.Task;
+import uhk.projekt.model.User;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,4 +18,5 @@ public interface TaskRepository extends JpaRepository<Task, Integer> {
     List<Task> findByProjectId(Integer projectId);
     List<Task> findBySolverId(Integer userId);
     List<Task> findByCreatorId(Integer userId);
+    List<Task> findBySolver(User solver);
 }

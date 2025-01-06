@@ -4,13 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import uhk.projekt.model.Role;
 import uhk.projekt.model.User;
 import uhk.projekt.repository.UserRepository;
 import uhk.projekt.security.SecurityConfig;
 import uhk.projekt.security.SharedConfig;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class UserServiceImp implements UserService {
@@ -19,7 +22,10 @@ public class UserServiceImp implements UserService {
     private UserRepository userRepository;
 
     @Autowired
-    private SharedConfig sharedConfig; // Pro hashování hesel
+    private SharedConfig sharedConfig;
+
+    @Autowired
+    private RoleService roleService;
 
     @Override
     @Transactional(readOnly = true)
@@ -41,10 +47,18 @@ public class UserServiceImp implements UserService {
 
     @Override
     @Transactional
-    public User saveUser(User user) {
+    public User saveUser(User user, Set<String> roleNames) {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             user.setPassword(user.getPassword());
         }
+
+        Set<Role> roles = new HashSet<>();
+        for (String roleName : roleNames) {
+            Optional<Role> roleOpt = roleService.getRoleByName(roleName);
+            roleOpt.ifPresent(roles::add);
+        }
+        user.setRoles(roles);
+
         return userRepository.save(user);
     }
 
