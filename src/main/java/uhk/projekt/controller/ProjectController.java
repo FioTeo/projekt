@@ -37,8 +37,6 @@ public class ProjectController {
     @Autowired
     private TimeLogService timeLogService;
 
-    private static final Logger logger = LoggerFactory.getLogger(ProjectController.class);
-
     /**
      * Zobrazí všechny projekty.
      */
@@ -64,7 +62,6 @@ public class ProjectController {
 
             // Kontrola, zda je aktuální uživatel tvůrcem projektu
             if (!project.getCreator().equals(currentUser)) {
-                logger.warn("User {} tried to access project {} without permission", username, id);
                 return "redirect:/projects?error=AccessDenied";
             }
 
@@ -74,7 +71,6 @@ public class ProjectController {
             model.addAttribute("task", new Task()); // Pro tvorbu nového úkolu
             return "project/project_detail";
         } else {
-            logger.error("Project with ID {} not found", id);
             return "redirect:/projects?error=ProjectNotFound";
         }
     }
@@ -99,7 +95,6 @@ public class ProjectController {
             Model model,
             Principal principal) {
         if (result.hasErrors()) {
-            logger.warn("Validation errors while creating project: {}", result.getAllErrors());
             return "project/project_edit";
         }
         try {
@@ -107,10 +102,8 @@ public class ProjectController {
             User currentUser = userService.findByEmail(email);
             project.setCreator(currentUser);
             projectService.saveProject(project);
-            logger.info("Project created successfully by user {}", currentUser.getEmail());
             return "redirect:/projects?success=ProjectCreated";
         } catch (RuntimeException ex) {
-            logger.error("Error while creating project: {}", ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
             return "project/project_edit";
         }
@@ -131,14 +124,12 @@ public class ProjectController {
 
             // Kontrola, zda je aktuální uživatel tvůrcem projektu
             if (!project.getCreator().equals(currentUser)) {
-                logger.warn("User {} tried to edit project {} without permission", username, id);
                 return "redirect:/projects?error=AccessDenied";
             }
 
             model.addAttribute("project", project);
             return "project/project_edit"; // Používáme stejný formulář pro editaci
         } else {
-            logger.error("Project with ID {} not found for editing", id);
             return "redirect:/projects?error=ProjectNotFound";
         }
     }
@@ -154,7 +145,6 @@ public class ProjectController {
             Model model,
             Principal principal) {
         if (result.hasErrors()) {
-            logger.warn("Validation errors while editing project {}: {}", id, result.getAllErrors());
             return "project/project_edit";
         }
         try {
@@ -165,7 +155,6 @@ public class ProjectController {
                 Project existingProject = existingProjectOpt.get();
 
                 if (!existingProject.getCreator().equals(currentUser)) {
-                    logger.warn("User {} tried to edit project {} without permission", username, id);
                     return "redirect:/projects?error=AccessDenied";
                 }
 
@@ -174,14 +163,11 @@ public class ProjectController {
                 existingProject.setBudget(project.getBudget());
 
                 projectService.saveProject(existingProject);
-                logger.info("Project {} updated successfully by user {}", id, currentUser.getEmail());
                 return "redirect:/projects?success=ProjectUpdated";
             } else {
-                logger.error("Project with ID {} not found for editing", id);
                 return "redirect:/projects?error=ProjectNotFound";
             }
         } catch (RuntimeException ex) {
-            logger.error("Error while editing project {}: {}", id, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
             return "project/project_edit";
         }
@@ -199,18 +185,14 @@ public class ProjectController {
             if (projectOpt.isPresent()) {
                 Project project = projectOpt.get();
                 if (!project.getCreator().equals(currentUser)) {
-                    logger.warn("User {} tried to delete project {} without permission", username, id);
                     return "redirect:/projects?error=AccessDenied";
                 }
                 projectService.deleteProjectById(id);
-                logger.info("Project {} deleted successfully by user {}", id, currentUser.getEmail());
                 return "redirect:/projects?success=ProjectDeleted";
             } else {
-                logger.error("Project with ID {} not found for deletion", id);
                 return "redirect:/projects?error=ProjectNotFound";
             }
         } catch (RuntimeException ex) {
-            logger.error("Error while deleting project {}: {}", id, ex.getMessage());
             return "redirect:/projects?error=" + ex.getMessage();
         }
     }
@@ -226,7 +208,6 @@ public class ProjectController {
             String username = principal.getName();
             User currentUser = userService.findByEmail(username);
             if (!project.getCreator().equals(currentUser)) {
-                logger.warn("User {} tried to create task in project {} without permission", username, projectId);
                 return "redirect:/projects?error=AccessDenied";
             }
             Task task = new Task();
@@ -235,7 +216,6 @@ public class ProjectController {
             model.addAttribute("users", userService.getAllUsers()); // Přidáno pro řešitele
             return "task/task_edit"; // Použijeme stejnou šablonu pro tvorbu a editaci úkolu
         } else {
-            logger.error("Project with ID {} not found for creating task", projectId);
             return "redirect:/projects?error=ProjectNotFound";
         }
     }
@@ -305,10 +285,8 @@ public class ProjectController {
 
             // Save the task
             taskService.saveTask(task);
-            logger.info("Task {} created successfully in project {} by user {}", task.getId(), projectId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "?success=TaskCreated";
         } catch (RuntimeException ex) {
-            logger.error("Error while creating task in project {}: {}", projectId, ex.getMessage());
             model.addAttribute("users", allUsers);
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("project", project);
@@ -326,13 +304,11 @@ public class ProjectController {
             Model model,
             Principal principal) {
 
-        logger.info("Navigating to task detail: projectId={}, taskId={}", projectId, taskId);
 
         Optional<Project> projectOpt = projectService.getProjectById(projectId);
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -340,21 +316,16 @@ public class ProjectController {
         Task task = taskOpt.get();
 
         // Logování získaných objektů
-        logger.info("Retrieved Project: {}", project);
-        logger.info("Retrieved Task: {}", task);
 
         // Ověření, že úkol patří do projektu
         if (!task.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
         // Ověření, že aktuální uživatel má přístup
         String username = principal.getName();
         User currentUser = userService.findByEmail(username);
-        logger.info("Current User: {}", currentUser.getEmail());
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} does not have access to Project ID {}", username, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
@@ -368,15 +339,6 @@ public class ProjectController {
         model.addAttribute("messages", messages);
         model.addAttribute("timeLog", new TimeLog()); // Pro přidání nového TimeLog
         model.addAttribute("message", new Message()); // Pro přidání nové zprávy
-
-        // Logování stavu modelu
-        logger.info("Model Attributes:");
-        logger.info("Project: {}", model.getAttribute("project"));
-        logger.info("Task: {}", model.getAttribute("task"));
-        logger.info("TimeLogs count: {}", (timeLogs != null ? timeLogs.size() : "null"));
-        logger.info("Messages count: {}", (messages != null ? messages.size() : "null"));
-        logger.info("TimeLog object: {}", model.getAttribute("timeLog"));
-        logger.info("Message object: {}", model.getAttribute("message"));
 
         return "task/task_detail"; // Šablona task_detail.html
     }
@@ -395,7 +357,6 @@ public class ProjectController {
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found for editing task", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -403,7 +364,6 @@ public class ProjectController {
         Task task = taskOpt.get();
 
         if (!task.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
@@ -411,7 +371,6 @@ public class ProjectController {
         User currentUser = userService.findByEmail(username);
 
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} tried to edit task {} in project {} without permission", username, taskId, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
@@ -441,7 +400,6 @@ public class ProjectController {
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found for editing task", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -449,7 +407,6 @@ public class ProjectController {
         Task existingTask = taskOpt.get();
 
         if (!existingTask.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
@@ -458,13 +415,11 @@ public class ProjectController {
         List<User> allUsers = userService.getAllUsers();
 
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} tried to edit task {} in project {} without permission", username, taskId, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
         // Zpracování validace
         if (result.hasErrors()) {
-            logger.warn("Validation errors while editing task {} in project {}: {}", taskId, projectId, result.getAllErrors());
             model.addAttribute("users", allUsers);
             model.addAttribute("task", existingTask);
             model.addAttribute("project", project);
@@ -504,10 +459,8 @@ public class ProjectController {
 
             // Uložení úkolu
             taskService.saveTask(existingTask);
-            logger.info("Task ID {} updated successfully in project {} by user {}", taskId, projectId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "/task/" + taskId + "?success=TaskUpdated";
         } catch (RuntimeException ex) {
-            logger.error("Error while editing task {} in project {}: {}", taskId, projectId, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
             model.addAttribute("users", allUsers);
             model.addAttribute("task", existingTask);
@@ -527,7 +480,6 @@ public class ProjectController {
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found for deletion", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -536,7 +488,6 @@ public class ProjectController {
 
         // Ověření, že úkol patří do projektu
         if (!task.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
@@ -546,16 +497,13 @@ public class ProjectController {
 
         // Ověření, že aktuální uživatel je tvůrcem projektu
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} tried to delete task {} in project {} without permission", username, taskId, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
         try {
             taskService.deleteTaskById(taskId);
-            logger.info("Task ID {} deleted successfully from Project ID {} by user {}", taskId, projectId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "?success=TaskDeleted";
         } catch (RuntimeException ex) {
-            logger.error("Error while deleting task {} from project {}: {}", taskId, projectId, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
             // Znovu načteme detail úkolu s chybovou zprávou
             return projectDetail(projectId, model, principal);
@@ -578,7 +526,6 @@ public class ProjectController {
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found for creating TimeLog", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -587,7 +534,6 @@ public class ProjectController {
 
         // Ověření, že úkol patří do projektu
         if (!task.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
@@ -596,12 +542,10 @@ public class ProjectController {
 
         // Ověření, zda má uživatel přístup k projektu
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} tried to create TimeLog in project {} without permission", username, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
         if (result.hasErrors()) {
-            logger.warn("Validation errors while creating TimeLog in task {}: {}", taskId, result.getAllErrors());
             // Přidání potřebných atributů do modelu
             List<TimeLog> timeLogs = timeLogService.getTimeLogsByTaskId(taskId);
             List<Message> messages = messageService.getMessagesByTaskId(taskId);
@@ -618,10 +562,8 @@ public class ProjectController {
             timeLog.setTask(task);
             timeLog.setUser(currentUser);
             timeLogService.saveTimeLog(timeLog);
-            logger.info("TimeLog created successfully for Task ID {} by user {}", taskId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "/task/" + taskId + "?success=TimeLogCreated";
         } catch (RuntimeException ex) {
-            logger.error("Error while creating TimeLog for Task ID {}: {}", taskId, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
 
             List<TimeLog> timeLogs = timeLogService.getTimeLogsByTaskId(taskId);
@@ -648,7 +590,6 @@ public class ProjectController {
         Optional<Task> taskOpt = taskService.getTaskById(taskId);
 
         if (projectOpt.isEmpty() || taskOpt.isEmpty()) {
-            logger.error("Project ID {} or Task ID {} not found for creating Message", projectId, taskId);
             return "redirect:/projects?error=ProjectOrTaskNotFound";
         }
 
@@ -656,7 +597,6 @@ public class ProjectController {
         Task task = taskOpt.get();
 
         if (!task.getProject().getId().equals(projectId)) {
-            logger.warn("Task ID {} does not belong to Project ID {}", taskId, projectId);
             return "redirect:/projects?error=InvalidTask";
         }
 
@@ -664,12 +604,10 @@ public class ProjectController {
         User currentUser = userService.findByEmail(username);
 
         if (!project.getCreator().equals(currentUser)) {
-            logger.warn("User {} tried to create Message in project {} without permission", username, projectId);
             return "redirect:/projects?error=AccessDenied";
         }
 
         if (result.hasErrors()) {
-            logger.warn("Validation errors while creating Message in task {}: {}", taskId, result.getAllErrors());
             List<TimeLog> timeLogs = timeLogService.getTimeLogsByTaskId(taskId);
             List<Message> messages = messageService.getMessagesByTaskId(taskId);
             model.addAttribute("project", project);
@@ -685,10 +623,8 @@ public class ProjectController {
             message.setTask(task);
             message.setUser(currentUser);
             messageService.saveMessage(message);
-            logger.info("Message created successfully for Task ID {} by user {}", taskId, currentUser.getEmail());
             return "redirect:/projects/detail/" + projectId + "/task/" + taskId + "?success=MessageCreated";
         } catch (RuntimeException ex) {
-            logger.error("Error while creating Message for Task ID {}: {}", taskId, ex.getMessage());
             model.addAttribute("errorMessage", ex.getMessage());
 
             List<TimeLog> timeLogs = timeLogService.getTimeLogsByTaskId(taskId);

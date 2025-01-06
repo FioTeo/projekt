@@ -1,8 +1,10 @@
 package uhk.projekt.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import jakarta.validation.Valid;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import uhk.projekt.model.Role;
 import uhk.projekt.model.User;
@@ -16,116 +18,116 @@ import java.util.stream.Collectors;
 @RequestMapping("/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
+    private final RoleService roleService;
 
-    @Autowired
-    private RoleService roleService;
+    public UserController(UserService userService, RoleService roleService) {
+        this.userService = userService;
+        this.roleService = roleService;
+    }
 
-    /**
-     * Zobrazí seznam všech uživatelů.
-     */
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public String listUsers(Model model) {
         List<User> users = userService.getAllUsers();
         model.addAttribute("users", users);
-        return "user/user_index"; // Corresponds to user_index.html
+        return "user/user_index";
     }
 
-    /**
-     * Zobrazí detaily specifického uživatele.
-     */
     @GetMapping("/detail/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String userDetail(@PathVariable Integer id, Model model) {
         Optional<User> userOpt = userService.getUserById(id);
         if (userOpt.isPresent()) {
             model.addAttribute("user", userOpt.get());
-            return "user/user_detail"; // Corresponds to user_detail.html
+            return "user/user_detail";
         } else {
+            model.addAttribute("errorMessage", "Uživatel nebyl nalezen.");
             return "redirect:/users?error=UserNotFound";
         }
     }
 
-    /**
-     * Zobrazí formulář pro vytvoření nového uživatele.
-     */
     @GetMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showCreateForm(Model model) {
         User user = new User();
         model.addAttribute("user", user);
-        model.addAttribute("allRoles", roleService.getAllRoles()); // Přidáme všechny role do modelu
-        return "user/user_edit"; // Corresponds to user_edit.html
+        model.addAttribute("allRoles", roleService.getAllRoles());
+        return "user/user_edit";
     }
 
-    /**
-     * Zpracuje odeslání formuláře pro vytvoření nového uživatele.
-     */
     @PostMapping("/create")
+    @PreAuthorize("hasRole('ADMIN')")
     public String createUser(
-            @ModelAttribute("user") User user,
-            @RequestParam("roles") List<String> roles,
+            @Valid @ModelAttribute("user") User user,
+            @RequestParam("roleNames") List<String> roles, // Změněno z "roles" na "roleNames"
+            BindingResult bindingResult,
             Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            return "user/user_edit";
+        }
         try {
             Set<String> roleNames = new HashSet<>(roles);
             userService.saveUser(user, roleNames);
             return "redirect:/users?success=UserCreated";
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            model.addAttribute("allRoles", roleService.getAllRoles()); // Zajistíme, že role jsou znovu načteny
+            model.addAttribute("allRoles", roleService.getAllRoles());
             return "user/user_edit";
         }
     }
 
-    /**
-     * Zobrazí formulář pro editaci existujícího uživatele.
-     */
     @GetMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String showEditForm(@PathVariable Integer id, Model model) {
         Optional<User> userOpt = userService.getUserById(id);
         if (userOpt.isPresent()) {
             User user = userOpt.get();
             model.addAttribute("user", user);
-            model.addAttribute("allRoles", roleService.getAllRoles()); // Přidáme všechny role do modelu
-            // Připravíme seznam rolí, které uživatel má
+            model.addAttribute("allRoles", roleService.getAllRoles());
             Set<String> userRoles = user.getRoles().stream()
                     .map(Role::getName)
                     .collect(Collectors.toSet());
             model.addAttribute("userRoles", userRoles);
-            return "user/user_edit"; // Reuse the same form for editing
+            return "user/user_edit";
         } else {
+            model.addAttribute("errorMessage", "Uživatel nebyl nalezen.");
             return "redirect:/users?error=UserNotFound";
         }
     }
 
-    /**
-     * Zpracuje odeslání formuláře pro editaci uživatele.
-     */
     @PostMapping("/edit/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public String editUser(
             @PathVariable Integer id,
-            @ModelAttribute("user") User user,
-            @RequestParam("roles") List<String> roles,
+            @Valid @ModelAttribute("user") User user,
+            @RequestParam("roleNames") List<String> roles, // Změněno z "roles" na "roleNames"
+            BindingResult bindingResult,
             Model model) {
+        if (bindingResult.hasErrors()) {
+            model.addAttribute("allRoles", roleService.getAllRoles());
+            return "user/user_edit";
+        }
         try {
             Set<String> roleNames = new HashSet<>(roles);
             userService.saveUser(user, roleNames);
             return "redirect:/users?success=UserUpdated";
         } catch (RuntimeException ex) {
             model.addAttribute("errorMessage", ex.getMessage());
-            model.addAttribute("allRoles", roleService.getAllRoles()); // Zajistíme, že role jsou znovu načteny
+            model.addAttribute("allRoles", roleService.getAllRoles());
             return "user/user_edit";
         }
     }
 
-    /**
-     * Zpracuje smazání uživatele.
-     */
     @GetMapping("/delete/{id}")
-    public String deleteUser(@PathVariable Integer id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public String deleteUser(@PathVariable Integer id, Model model) {
         try {
             userService.deleteUserById(id);
             return "redirect:/users?success=UserDeleted";
         } catch (RuntimeException ex) {
+            model.addAttribute("errorMessage", ex.getMessage());
             return "redirect:/users?error=" + ex.getMessage();
         }
     }

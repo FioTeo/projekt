@@ -5,8 +5,10 @@ import org.springframework.stereotype.Service;
 import uhk.projekt.model.Role;
 import uhk.projekt.repository.RoleRepository;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class RoleService {
@@ -41,5 +43,19 @@ public class RoleService {
      */
     public Role createRole(Role role) {
         return roleRepository.save(role);
+    }
+
+    /**
+     * Najde role podle názvů.
+     *
+     * @param roleNames seznam názvů rolí
+     * @return sada rolí
+     */
+    public Set<Role> getRolesByNames(Set<String> roleNames) {
+        List<Role> roles = roleRepository.findAllByNameIn(roleNames);
+        if (roles.size() != roleNames.size()) {
+            throw new RuntimeException("Některé role nebyly nalezeny.");
+        }
+        return new HashSet<>(roles);
     }
 }

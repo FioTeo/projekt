@@ -51,19 +51,19 @@
                     <div th:if="${#fields.hasErrors('email')}" class="text-danger" th:errors="*{email}">Chyba v emailu</div>
                 </div>
 
-                <!-- Heslo -->
                 <div class="mb-4">
                     <label for="password" class="form-label">Heslo:</label>
                     <input type="password" id="password" th:field="*{password}" class="form-control"
                            th:placeholder="${user.id != null} ? 'Zadejte nové heslo nebo ponechte prázdné' : 'Zadejte heslo'"
                            th:required="${user.id == null}">
-                    <div th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="*{password}">Chyba v hesle</div>
+                    <div th:if="${#fields.hasErrors('password')}" class="text-danger" th:errors="*{password}">Chybné v heslo</div>
+                    <small class="form-text text-muted">Heslo musí mít alespoň 6 znaků.</small>
                 </div>
 
                 <!-- Role -->
                 <div class="mb-4">
                     <label for="roles" class="form-label">Role:</label>
-                    <select id="roles" name="roles" class="form-select" multiple required>
+                    <select id="roles" name="roleNames" class="form-select" multiple required>
                         <th:block th:each="role : ${allRoles}">
                             <option th:value="${role.name}"
                                     th:text="${role.name}"
@@ -87,20 +87,5 @@
 <!-- Bootstrap JS a závislosti -->
 <script th:src="@{/assets/scripts/bootstrap.bundle.min.js}"></script>
 <!-- Optional JavaScript pro validaci formuláře -->
-<script>
-    (function () {
-        'use strict'
-        const forms = document.querySelectorAll('.needs-validation')
-        Array.from(forms).forEach(function (form) {
-            form.addEventListener('submit', function (event) {
-                if (!form.checkValidity()) {
-                    event.preventDefault()
-                    event.stopPropagation()
-                }
-                form.classList.add('was-validated')
-            }, false)
-        })
-    })()
-</script>
 </body>
 </html>

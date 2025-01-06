@@ -59,7 +59,6 @@
                 <td th:text="${#temporals.format(user.createdAt, 'yyyy-MM-dd HH:mm')}">2025-01-01 12:00</td>
                 <td>
                     <a th:href="@{'/users/detail/' + ${user.id}}" class="btn btn-info btn-sm me-2">Detail</a>
-                    <a th:href="@{'/users/edit/' + ${user.id}}" class="btn btn-primary btn-sm me-2">Editovat</a>
                     <a th:href="@{'/users/delete/' + ${user.id}}" class="btn btn-danger btn-sm"
                        onclick="return confirm('Opravdu chcete smazat tohoto uživatele?');">Smazat</a>
                 </td>
